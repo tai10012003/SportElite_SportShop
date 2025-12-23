@@ -17,6 +17,8 @@ namespace WebService.DTOs.Products
         public int SoLuong { get; set; }
         public string MaDanhMuc { get; set; } = string.Empty;
         public string MaThuongHieu { get; set; } = string.Empty;
+        public string TenDanhMuc { get; set; } = string.Empty;
+        public string TenThuongHieu { get; set; } = string.Empty;
         public bool TinhTrang { get; set; }
         public bool NoiBat { get; set; }
         public int LuotXem { get; set; }

@@ -19,6 +19,7 @@ namespace WebService.Interfaces.Products
         Task<ProductResponseDTO?> GetBySlugAsync(string slug);
         Task<ProductResponseDTO?> GetByCodeAsync(string maSanPham);
         Task<IEnumerable<GetProductDTO>> GetFeaturedAsync();
+        Task<IEnumerable<GetProductDTO>> GetRelatedAsync(string slug);
         Task<ProductResponseDTO> CreateAsync(CreateProductDTO productDto);
         Task UpdateAsync(int id, UpdateProductDTO productDto);
         Task DeleteAsync(int id);

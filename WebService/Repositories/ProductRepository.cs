@@ -35,16 +35,36 @@ namespace WebService.Repositories
                 .FirstOrDefaultAsync(p => p.MaSanPham == maSanPham);
         }
 
-        public async Task<Product> GetBySlugAsync(string slug)
+        private async Task<Product?> GetBySlugInternalAsync(string slug, bool increaseView = false)
         {
             var product = await _context.Products.Include(p => p.HinhAnh).FirstOrDefaultAsync(p => p.Slug == slug);
-            if (product != null)
+            if (product != null && increaseView)
             {
                 product.LuotXem += 1;
                 _context.Entry(product).Property(p => p.LuotXem).IsModified = true;
                 await _context.SaveChangesAsync();
             }
             return product;
+        }
+
+        public async Task<Product?> GetBySlugAsync(string slug)
+        {
+            return await GetBySlugInternalAsync(slug, true);
+        }
+
+        public async Task<IEnumerable<Product>> GetRelatedAsync(string slug, int take = 8)
+        {
+            var currentProduct = await GetBySlugInternalAsync(slug, false);
+            if (currentProduct == null)
+                return new List<Product>();
+            return await _context.Products
+                .Include(p => p.HinhAnh)
+                .Where(p => p.Id != currentProduct.Id && (p.MaDanhMuc == currentProduct.MaDanhMuc || p.MaThuongHieu == currentProduct.MaThuongHieu))
+                .OrderByDescending(p => p.NoiBat ? 1 : 0)
+                .ThenByDescending(p => p.GiaKhuyenMai != null ? 1 : 0)
+                .ThenByDescending(p => p.NgayTao)
+                .Take(take)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Product>> GetFeaturedAsync()

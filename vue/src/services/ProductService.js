@@ -21,7 +21,7 @@ export default {
     }
   },
 
-async getProducts(params = {}) {
+  async getProducts(params = {}) {
     try {
       const res = await axios.get(`${API_URL}/product`, { params })
       const products = Array.isArray(res.data.products) ? res.data.products : []
@@ -50,38 +50,40 @@ async getProducts(params = {}) {
       }
     }
   },
+
   async getBrands() {
     const res = await axios.get('/api/Brand')
     return res.data
   },
+
   async getCategories() {
     const res = await axios.get('/api/Category')
     return res.data
   },
 
-async getSuggestions(query) {
+  async getSuggestions(query) {
     const res = await axios.get(`${API_URL}/Product/suggest`, { params: { query } })
     return res.data
-},
+  },
 
-async getProductDetail(slug) {
-  try {
-    const res = await axios.get(`${API_URL}/Product/slug/${slug}`)
-    const product = res.data
-    const mainImage = this.getMainImage(product)
-    const images = product.hinhAnh?.map(img => 
-      `${VUE_BASE_URL}${img.duongDan.replace('/assets', '/src/assets')}`
-    )
-    return {
-      ...product,
-      mainImage,
-      images,
+  async getProductDetail(slug) {
+    try {
+      const res = await axios.get(`${API_URL}/Product/slug/${slug}`)
+      const product = res.data
+      const mainImage = this.getMainImage(product)
+      const images = product.hinhAnh?.map(img => 
+        `${VUE_BASE_URL}${img.duongDan.replace('/assets', '/src/assets')}`
+      )
+      return {
+        ...product,
+        mainImage,
+        images,
+      }
+    } catch (error) {
+      console.error('Error fetching product detail:', error)
+      throw new Error('Không thể tải thông tin sản phẩm')
     }
-  } catch (error) {
-    console.error('Error fetching product detail:', error)
-    throw new Error('Không thể tải thông tin sản phẩm')
-  }
-},
+  },
 
   async getProductReviews(productId) {
     try {
@@ -95,17 +97,17 @@ async getProductDetail(slug) {
 
   async getRelatedProducts(slug) {
     try {
-      const res = await axios.get(`${API_URL}/related-products/${slug}`)
+      const res = await axios.get(`${API_URL}/Product/related/${slug}`);
       return res.data.map(product => {
-        const mainImage = this.getMainImage(product)
-        return { ...product, mainImage }
-      })
+        const mainImage = this.getMainImage(product);
+        return { ...product, mainImage };
+      });
     } catch (error) {
-      console.error('Error fetching related products:', error)
-      return []
+      console.error('Error fetching related products:', error);
+      return [];
     }
   },
-  
+
   getMainImage(product) {
     if (!product.hinhAnh || !product.hinhAnh.length) return null
     const mainImage = product.hinhAnh.find(img => img.anhChinh) || product.hinhAnh[0]

@@ -37,9 +37,7 @@ namespace WebService.Controllers
             var (products, totalCount) = await _productService.GetAllAsync(search, category, brand, price, sort, page, pageSize, promotion);
             var categories = await _categoryService.GetAllAsync();
             var brands = await _brandService.GetAllAsync();
-
             var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-
             return Ok(new
             {
                 products = products,
@@ -62,6 +60,13 @@ namespace WebService.Controllers
         {
             var products = await _productService.GetFeaturedAsync();
             return Ok(products);
+        }
+
+        [HttpGet("related/{slug}")]
+        public async Task<ActionResult<IEnumerable<GetProductDTO>>> GetRelatedProducts(string slug)
+        {
+            var related = await _productService.GetRelatedAsync(slug);
+            return Ok(related);
         }
 
         [HttpGet("{id:int}")]
