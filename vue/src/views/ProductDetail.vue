@@ -20,7 +20,7 @@
             <div class="tab-content">
               <DetailedDes :product="product" />
               <Specifications :product="product" />
-              <ProductReview :product="product" :reviews="reviews" :is-logged-in="isLoggedIn" />
+              <ProductReview :product="product" :reviews="reviews" @review-added="addNewReview" :is-logged-in="isLoggedIn" />
             </div>
           </div>
         </div>
@@ -39,6 +39,7 @@ import Specifications from '@/components/user/productdetail/Specifications.vue'
 import ProductReview from '@/components/user/productdetail/ProductReview.vue'
 import RelatedProduct from '@/components/user/productdetail/RelatedProduct.vue'
 import ProductService from '@/services/ProductService'
+import AuthService from '@/services/AuthService'
 
 const props = defineProps({
   slug: String
@@ -47,23 +48,31 @@ const props = defineProps({
 const product = ref(null)
 const reviews = ref([])
 const relatedProducts = ref([])
-const isLoggedIn = ref(!!localStorage.getItem('user_id'))
+const isLoggedIn = ref(AuthService.isLoggedIn())
 
 const fetchProductData = async (slugValue) => {
   try {
     const productData = await ProductService.getProductDetail(slugValue)
     product.value = productData
-
     if (product.value) {
-      const reviewRes = await ProductService.getProductReviews(product.value.id)
+      const reviewRes = await ProductService.getProductReviews(product.value.maSanPham)
       reviews.value = reviewRes
-
       const relatedRes = await ProductService.getRelatedProducts(slugValue)
       relatedProducts.value = relatedRes
     }
   } catch (error) {
     console.error('Error fetching product data:', error)
     product.value = null
+  }
+}
+
+const addNewReview = async (newReview) => {
+  reviews.value.unshift(newReview)
+  try {
+    const freshReviews = await ProductService.getProductReviews(product.value.id)
+    reviews.value = freshReviews
+  } catch (error) {
+    console.error('Error reloading reviews:', error)
   }
 }
 

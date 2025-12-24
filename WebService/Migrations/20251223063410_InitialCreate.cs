@@ -15,11 +15,11 @@ namespace WebService.Migrations
                 name: "Brands",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ma_thuong_hieu = table.Column<string>(type: "varchar(8)", nullable: false),
-                    ten_thuong_hieu = table.Column<string>(type: "varchar(50)", nullable: false),
-                    mo_ta = table.Column<string>(type: "text", nullable: true),
+                    ten_thuong_hieu = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    mo_ta = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     logo = table.Column<string>(type: "varchar(255)", nullable: true),
                     website = table.Column<string>(type: "varchar(100)", nullable: true),
                     thu_tu = table.Column<int>(type: "int", nullable: false),
@@ -30,7 +30,7 @@ namespace WebService.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Brands", x => x.Id);
+                    table.PrimaryKey("PK_Brands", x => x.id);
                     table.UniqueConstraint("AK_Brands_ma_thuong_hieu", x => x.ma_thuong_hieu);
                 });
 
@@ -38,11 +38,11 @@ namespace WebService.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ma_danh_muc = table.Column<string>(type: "varchar(8)", nullable: false),
-                    ten_danh_muc = table.Column<string>(type: "varchar(50)", nullable: false),
-                    mo_ta = table.Column<string>(type: "text", nullable: true),
+                    ten_danh_muc = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    mo_ta = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     hinh_anh = table.Column<string>(type: "varchar(255)", nullable: true),
                     danh_muc_cha = table.Column<int>(type: "int", nullable: true),
                     thu_tu = table.Column<int>(type: "int", nullable: false),
@@ -53,25 +53,48 @@ namespace WebService.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.id);
                     table.UniqueConstraint("AK_Categories_ma_danh_muc", x => x.ma_danh_muc);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ma_nguoi_dung = table.Column<string>(type: "varchar(8)", nullable: false),
+                    ten_dang_nhap = table.Column<string>(type: "varchar(30)", nullable: false),
+                    mat_khau = table.Column<string>(type: "varchar(255)", nullable: false),
+                    email = table.Column<string>(type: "varchar(100)", nullable: false),
+                    ho_ten = table.Column<string>(type: "nvarchar(40)", nullable: false),
+                    so_dien_thoai = table.Column<string>(type: "varchar(20)", nullable: true),
+                    dia_chi = table.Column<string>(type: "nvarchar(200)", nullable: true),
+                    quyen = table.Column<string>(type: "varchar(10)", nullable: false),
+                    trang_thai = table.Column<bool>(type: "bit", nullable: false),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    ngay_cap_nhat = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ma_san_pham = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
-                    ten_san_pham = table.Column<string>(type: "varchar(255)", nullable: false),
-                    mo_ta = table.Column<string>(type: "text", nullable: true),
-                    mo_ta_chi_tiet = table.Column<string>(type: "text", nullable: true),
-                    kich_thuoc = table.Column<string>(type: "varchar(50)", nullable: true),
-                    mau_sac = table.Column<string>(type: "varchar(50)", nullable: true),
-                    chat_lieu = table.Column<string>(type: "varchar(100)", nullable: true),
-                    xuat_xu = table.Column<string>(type: "varchar(100)", nullable: true),
-                    bao_hanh = table.Column<string>(type: "varchar(50)", nullable: true),
+                    ten_san_pham = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    mo_ta = table.Column<string>(type: "nvarchar(150)", nullable: true),
+                    mo_ta_chi_tiet = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    kich_thuoc = table.Column<string>(type: "nvarchar(30)", nullable: true),
+                    mau_sac = table.Column<string>(type: "nvarchar(30)", nullable: true),
+                    chat_lieu = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    xuat_xu = table.Column<string>(type: "nvarchar(30)", nullable: true),
+                    bao_hanh = table.Column<string>(type: "nvarchar(20)", nullable: true),
                     gia = table.Column<decimal>(type: "decimal(15,2)", nullable: false),
                     gia_khuyen_mai = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
                     so_luong = table.Column<int>(type: "int", nullable: false),
@@ -86,7 +109,7 @@ namespace WebService.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.id);
                     table.UniqueConstraint("AK_Products_ma_san_pham", x => x.ma_san_pham);
                     table.ForeignKey(
                         name: "FK_Products_Brands_ma_thuong_hieu",
@@ -126,9 +149,38 @@ namespace WebService.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductReviews",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ma_san_pham = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    ma_nguoi_dung = table.Column<string>(type: "varchar(8)", nullable: false),
+                    diem_danh_gia = table.Column<int>(type: "int", nullable: false),
+                    noi_dung = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    ngay_tao = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    ngay_cap_nhat = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductReviews", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_ProductReviews_Products_ma_san_pham",
+                        column: x => x.ma_san_pham,
+                        principalTable: "Products",
+                        principalColumn: "ma_san_pham",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_ma_san_pham",
                 table: "ProductImages",
+                column: "ma_san_pham");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductReviews_ma_san_pham",
+                table: "ProductReviews",
                 column: "ma_san_pham");
 
             migrationBuilder.CreateIndex(
@@ -147,6 +199,12 @@ namespace WebService.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ProductImages");
+
+            migrationBuilder.DropTable(
+                name: "ProductReviews");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Products");

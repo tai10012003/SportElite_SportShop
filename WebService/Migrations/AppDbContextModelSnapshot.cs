@@ -157,12 +157,6 @@ namespace WebService.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("bao_hanh");
 
-                    b.Property<int>("BrandId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ChatLieu")
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("chat_lieu");
@@ -248,10 +242,6 @@ namespace WebService.Migrations
                         .HasColumnName("xuat_xu");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BrandId");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("MaDanhMuc");
 
@@ -377,6 +367,11 @@ namespace WebService.Migrations
                         .HasColumnType("nvarchar(40)")
                         .HasColumnName("ho_ten");
 
+                    b.Property<string>("MaNguoiDung")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("ma_nguoi_dung");
+
                     b.Property<string>("MatKhau")
                         .IsRequired()
                         .HasColumnType("varchar(255)")
@@ -419,18 +414,6 @@ namespace WebService.Migrations
 
             modelBuilder.Entity("WebService.Models.Product", b =>
                 {
-                    b.HasOne("WebService.Models.Brand", "ThuongHieu")
-                        .WithMany()
-                        .HasForeignKey("BrandId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebService.Models.Category", "DanhMuc")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebService.Models.Category", null)
                         .WithMany()
                         .HasForeignKey("MaDanhMuc")
@@ -444,10 +427,6 @@ namespace WebService.Migrations
                         .HasPrincipalKey("MaThuongHieu")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DanhMuc");
-
-                    b.Navigation("ThuongHieu");
                 });
 
             modelBuilder.Entity("WebService.Models.ProductImage", b =>

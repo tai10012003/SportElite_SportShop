@@ -85,13 +85,26 @@ export default {
     }
   },
 
-  async getProductReviews(productId) {
+  async getProductReviews(maSanPham) {
     try {
-      const res = await axios.get(`${API_URL}/ProductReviews/product/${productId}`)
+      const res = await axios.get(`${API_URL}/ProductReviews/product/${maSanPham}`)
       return res.data
     } catch (error) {
       console.error('Error fetching reviews:', error)
       return []
+    }
+  },
+
+  async submitReview(reviewData) {
+    try {
+      const res = await axios.post(`${API_URL}/ProductReviews`, reviewData);
+      return res.data;
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Gửi đánh giá thất bại');
+      }
+      throw new Error('Lỗi kết nối server');
     }
   },
 

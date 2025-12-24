@@ -12,7 +12,7 @@ using WebService.Data;
 namespace WebService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250612123122_InitialCreate")]
+    [Migration("20251223063410_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -30,7 +30,7 @@ namespace WebService.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -44,7 +44,7 @@ namespace WebService.Migrations
                         .HasColumnName("ma_thuong_hieu");
 
                     b.Property<string>("MoTa")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("mo_ta");
 
                     b.Property<DateTime>("NgayCapNhat")
@@ -66,7 +66,7 @@ namespace WebService.Migrations
 
                     b.Property<string>("TenThuongHieu")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("ten_thuong_hieu");
 
                     b.Property<int>("ThuTu")
@@ -91,7 +91,7 @@ namespace WebService.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -109,7 +109,7 @@ namespace WebService.Migrations
                         .HasColumnName("ma_danh_muc");
 
                     b.Property<string>("MoTa")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("mo_ta");
 
                     b.Property<DateTime>("NgayCapNhat")
@@ -131,7 +131,7 @@ namespace WebService.Migrations
 
                     b.Property<string>("TenDanhMuc")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("ten_danh_muc");
 
                     b.Property<int>("ThuTu")
@@ -152,16 +152,16 @@ namespace WebService.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BaoHanh")
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(20)")
                         .HasColumnName("bao_hanh");
 
                     b.Property<string>("ChatLieu")
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("chat_lieu");
 
                     b.Property<decimal>("Gia")
@@ -173,7 +173,7 @@ namespace WebService.Migrations
                         .HasColumnName("gia_khuyen_mai");
 
                     b.Property<string>("KichThuoc")
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(30)")
                         .HasColumnName("kich_thuoc");
 
                     b.Property<int>("LuotXem")
@@ -197,15 +197,15 @@ namespace WebService.Migrations
                         .HasColumnName("ma_thuong_hieu");
 
                     b.Property<string>("MauSac")
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(30)")
                         .HasColumnName("mau_sac");
 
                     b.Property<string>("MoTa")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(150)")
                         .HasColumnName("mo_ta");
 
                     b.Property<string>("MoTaChiTiet")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("mo_ta_chi_tiet");
 
                     b.Property<DateTime>("NgayCapNhat")
@@ -233,7 +233,7 @@ namespace WebService.Migrations
 
                     b.Property<string>("TenSanPham")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("ten_san_pham");
 
                     b.Property<bool>("TinhTrang")
@@ -241,7 +241,7 @@ namespace WebService.Migrations
                         .HasColumnName("tinh_trang");
 
                     b.Property<string>("XuatXu")
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("nvarchar(30)")
                         .HasColumnName("xuat_xu");
 
                     b.HasKey("Id");
@@ -300,6 +300,121 @@ namespace WebService.Migrations
                     b.ToTable("ProductImages");
                 });
 
+            modelBuilder.Entity("WebService.Models.ProductReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DiemDanhGia")
+                        .HasColumnType("int")
+                        .HasColumnName("diem_danh_gia");
+
+                    b.Property<string>("MaNguoiDung")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("ma_nguoi_dung");
+
+                    b.Property<string>("MaSanPham")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)")
+                        .HasColumnName("ma_san_pham");
+
+                    b.Property<DateTime>("NgayCapNhat")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ngay_cap_nhat")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("NgayTao")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ngay_tao")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("NoiDung")
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("noi_dung");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaSanPham");
+
+                    b.ToTable("ProductReviews");
+                });
+
+            modelBuilder.Entity("WebService.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DiaChi")
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("dia_chi");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("HoTen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(40)")
+                        .HasColumnName("ho_ten");
+
+                    b.Property<string>("MaNguoiDung")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("ma_nguoi_dung");
+
+                    b.Property<string>("MatKhau")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("mat_khau");
+
+                    b.Property<DateTime>("NgayCapNhat")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ngay_cap_nhat")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("NgayTao")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ngay_tao")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Quyen")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("quyen");
+
+                    b.Property<string>("SoDienThoai")
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("so_dien_thoai");
+
+                    b.Property<string>("TenDangNhap")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("ten_dang_nhap");
+
+                    b.Property<bool>("TrangThai")
+                        .HasColumnType("bit")
+                        .HasColumnName("trang_thai");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("WebService.Models.Product", b =>
                 {
                     b.HasOne("WebService.Models.Category", null)
@@ -327,6 +442,16 @@ namespace WebService.Migrations
                         .IsRequired();
 
                     b.Navigation("SanPham");
+                });
+
+            modelBuilder.Entity("WebService.Models.ProductReview", b =>
+                {
+                    b.HasOne("WebService.Models.Product", null)
+                        .WithMany()
+                        .HasForeignKey("MaSanPham")
+                        .HasPrincipalKey("MaSanPham")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebService.Models.Product", b =>
