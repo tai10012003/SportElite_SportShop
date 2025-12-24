@@ -39,6 +39,7 @@ namespace WebService.Services
             return new AuthResponseDTO
             {
                 Id = user.Id,
+                MaNguoiDung = user.MaNguoiDung,
                 Email = user.Email,
                 HoTen = user.HoTen,
                 Quyen = user.Quyen,
@@ -80,13 +81,21 @@ namespace WebService.Services
             var emailExists = await _authRepository.GetUserByEmailAsync(registerDto.Email);
             if (emailExists != null)
                 throw new Exception("Email đã được sử dụng");
-
             var usernameExists = await _authRepository.GetUserByUsernameAsync(registerDto.TenDangNhap);
             if (usernameExists != null)
                 throw new Exception("Tên đăng nhập đã tồn tại");
+            string maNguoiDung;
+            int counter = 1;
+            do
+            {
+                maNguoiDung = $"USER{counter:D3}";
+                counter++;
+            }
+            while (await _authRepository.GetUserByMaNguoiDungAsync(maNguoiDung) != null);
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.MatKhau);
             var user = new User
             {
+                MaNguoiDung = maNguoiDung,
                 TenDangNhap = registerDto.TenDangNhap,
                 Email = registerDto.Email,
                 HoTen = registerDto.HoTen,
@@ -104,10 +113,11 @@ namespace WebService.Services
             return new AuthResponseDTO
             {
                 Id = createdUser.Id,
+                MaNguoiDung = createdUser.MaNguoiDung,
                 Email = createdUser.Email,
                 HoTen = createdUser.HoTen,
-                Token = token,
-                Quyen = createdUser.Quyen
+                Quyen = createdUser.Quyen,
+                Token = token
             };
         }
     }

@@ -10,6 +10,9 @@ namespace WebService.Models
         [Column("id")]
         public int Id { get; set; }
 
+        [Column("ma_nguoi_dung", TypeName = "varchar(8)")]
+        public string MaNguoiDung { get; set; } = string.Empty;
+
         [Required]
         [Column("ten_dang_nhap", TypeName = "varchar(30)")]
         public string TenDangNhap { get; set; } = string.Empty;
@@ -19,7 +22,6 @@ namespace WebService.Models
 
         [Column("email", TypeName = "varchar(100)")]
         public string Email { get; set; } = string.Empty;
-
 
         [Required]
         [Column("ho_ten", TypeName = "nvarchar(40)")]
