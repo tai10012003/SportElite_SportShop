@@ -23,19 +23,14 @@ namespace WebService.Services
         public async Task<AuthResponseDTO> LoginAsync(LoginDTO loginDto)
         {
             var user = await _authRepository.GetUserByEmailAsync(loginDto.Email);
-            
             if (user == null)
                 throw new Exception("Email không tồn tại");
-
             var isValidPassword = await _authRepository.ValidatePasswordAsync(user, loginDto.Password);
             if (!isValidPassword)
                 throw new Exception("Mật khẩu không đúng");
-
             if (!user.TrangThai)
                 throw new Exception("Tài khoản đã bị khóa");
-
             var token = GenerateJwtToken(user);
-
             return new AuthResponseDTO
             {
                 Id = user.Id,
@@ -53,7 +48,6 @@ namespace WebService.Services
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
             var issuer = _configuration["Jwt:Issuer"];
             var audience = _configuration["Jwt:Audience"];
-
             var claims = new List<Claim>
             {
                 new Claim("uid", user.Id.ToString()),
@@ -109,7 +103,6 @@ namespace WebService.Services
             };
             var createdUser = await _authRepository.CreateUserAsync(user);
             var token = GenerateJwtToken(createdUser);
-
             return new AuthResponseDTO
             {
                 Id = createdUser.Id,

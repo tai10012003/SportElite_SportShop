@@ -56,25 +56,43 @@ namespace WebService.Services
                         query = query.Where(p => p.Gia >= minUp);
                 }
             }
-            if (promotion)
-                query = query.Where(p => p.GiaKhuyenMai != null && p.GiaKhuyenMai < p.Gia);
-
+            if (promotion) query = query.Where(p => p.GiaKhuyenMai != null && p.GiaKhuyenMai < p.Gia);
             query = ApplySorting(query, sort);
-
-            int totalCount = query.Count();
             var pagedProducts = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            int totalCount = query.Count();
             if (pagedProducts.Any())
             {
+                var maSanPhams = pagedProducts.Select(p => p.MaSanPham).ToList();
                 var maDanhMucs = pagedProducts.Select(p => p.MaDanhMuc).Distinct().ToList();
                 var maThuongHieus = pagedProducts.Select(p => p.MaThuongHieu).Distinct().ToList();
                 var categories = await _context.Categories.Where(c => maDanhMucs.Contains(c.MaDanhMuc)).ToDictionaryAsync(c => c.MaDanhMuc, c => c.TenDanhMuc);
                 var brands = await _context.Brands.Where(b => maThuongHieus.Contains(b.MaThuongHieu)).ToDictionaryAsync(b => b.MaThuongHieu, b => b.TenThuongHieu);
+                var reviewStats = await _context.ProductReviews
+                    .Where(r => maSanPhams.Contains(r.MaSanPham))
+                    .GroupBy(r => r.MaSanPham)
+                    .Select(g => new
+                    {
+                        MaSanPham = g.Key,
+                        AverageRating = g.Average(r => r.DiemDanhGia),
+                        TotalReviews = g.Count()
+                    })
+                    .ToDictionaryAsync(x => x.MaSanPham);
                 var dtos = _mapper.Map<List<GetProductDTO>>(pagedProducts);
                 foreach (var dto in dtos)
                 {
-                    var product = pagedProducts.First(p => p.Id == dto.Id);
+                    var product = pagedProducts.First(p => p.MaSanPham == dto.MaSanPham);
                     dto.TenDanhMuc = categories.GetValueOrDefault(product.MaDanhMuc, "Danh mục");
                     dto.TenThuongHieu = brands.GetValueOrDefault(product.MaThuongHieu, "Thương hiệu");
+                    if (reviewStats.TryGetValue(product.MaSanPham, out var stats))
+                    {
+                        dto.AverageRating = Math.Round(stats.AverageRating, 1);
+                        dto.TotalReviews = stats.TotalReviews;
+                    }
+                    else
+                    {
+                        dto.AverageRating = 0;
+                        dto.TotalReviews = 0;
+                    }
                 }
                 return (dtos, totalCount);
             }
@@ -172,16 +190,27 @@ namespace WebService.Services
             var productList = products.ToList();
             if (productList.Any())
             {
+                var maSanPhams = productList.Select(p => p.MaSanPham).ToList();
                 var maDanhMucs = productList.Select(p => p.MaDanhMuc).Distinct();
                 var maThuongHieus = productList.Select(p => p.MaThuongHieu).Distinct();
                 var categories = await _context.Categories.Where(c => maDanhMucs.Contains(c.MaDanhMuc)).ToDictionaryAsync(c => c.MaDanhMuc, c => c.TenDanhMuc);
                 var brands = await _context.Brands.Where(b => maThuongHieus.Contains(b.MaThuongHieu)).ToDictionaryAsync(b => b.MaThuongHieu, b => b.TenThuongHieu);
+                var reviewStats = await _context.ProductReviews
+                    .Where(r => maSanPhams.Contains(r.MaSanPham))
+                    .GroupBy(r => r.MaSanPham)
+                    .Select(g => new { MaSanPham = g.Key, Avg = g.Average(r => r.DiemDanhGia), Count = g.Count() })
+                    .ToDictionaryAsync(x => x.MaSanPham);
                 var dtos = _mapper.Map<List<GetProductDTO>>(productList);
                 foreach (var dto in dtos)
                 {
-                    var product = productList.First(p => p.Id == dto.Id);
+                    var product = productList.First(p => p.MaSanPham == dto.MaSanPham);
                     dto.TenDanhMuc = categories.GetValueOrDefault(product.MaDanhMuc, "Danh mục");
                     dto.TenThuongHieu = brands.GetValueOrDefault(product.MaThuongHieu, "Thương hiệu");
+                    if (reviewStats.TryGetValue(product.MaSanPham, out var stats))
+                    {
+                        dto.AverageRating = Math.Round(stats.Avg, 1);
+                        dto.TotalReviews = stats.Count;
+                    }
                 }
                 return dtos;
             }
@@ -194,16 +223,27 @@ namespace WebService.Services
             var productList = relatedProducts.ToList();
             if (productList.Any())
             {
+                var maSanPhams = productList.Select(p => p.MaSanPham).ToList();
                 var maDanhMucs = productList.Select(p => p.MaDanhMuc).Distinct();
                 var maThuongHieus = productList.Select(p => p.MaThuongHieu).Distinct();
                 var categories = await _context.Categories.Where(c => maDanhMucs.Contains(c.MaDanhMuc)).ToDictionaryAsync(c => c.MaDanhMuc, c => c.TenDanhMuc);
                 var brands = await _context.Brands.Where(b => maThuongHieus.Contains(b.MaThuongHieu)).ToDictionaryAsync(b => b.MaThuongHieu, b => b.TenThuongHieu);
+                var reviewStats = await _context.ProductReviews
+                    .Where(r => maSanPhams.Contains(r.MaSanPham))
+                    .GroupBy(r => r.MaSanPham)
+                    .Select(g => new { MaSanPham = g.Key, Avg = g.Average(r => r.DiemDanhGia), Count = g.Count() })
+                    .ToDictionaryAsync(x => x.MaSanPham);
                 var dtos = _mapper.Map<List<GetProductDTO>>(productList);
                 foreach (var dto in dtos)
                 {
-                    var product = productList.First(p => p.Id == dto.Id);
+                    var product = productList.First(p => p.MaSanPham == dto.MaSanPham);
                     dto.TenDanhMuc = categories.GetValueOrDefault(product.MaDanhMuc, "Danh mục");
                     dto.TenThuongHieu = brands.GetValueOrDefault(product.MaThuongHieu, "Thương hiệu");
+                    if (reviewStats.TryGetValue(product.MaSanPham, out var stats))
+                    {
+                        dto.AverageRating = Math.Round(stats.Avg, 1);
+                        dto.TotalReviews = stats.Count;
+                    }
                 }
                 return dtos;
             }

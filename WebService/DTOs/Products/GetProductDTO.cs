@@ -11,6 +11,8 @@ namespace WebService.DTOs.Products
         public decimal? GiaKhuyenMai { get; set; }
         public string Slug { get; set; } = string.Empty;
         public bool NoiBat { get; set; }
+        public double AverageRating { get; set; } = 0;
+        public int TotalReviews { get; set; } = 0;
         public ICollection<ProductImageInProductDTO> HinhAnh { get; set; } = new List<ProductImageInProductDTO>();
     }
 }
