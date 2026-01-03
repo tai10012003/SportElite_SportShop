@@ -37,9 +37,9 @@ namespace WebService.Repositories
             return user;
         }
 
-        public async Task<bool> ValidatePasswordAsync(User user, string password)
+        public Task<bool> ValidatePasswordAsync(User user, string password)
         {
-            return BCrypt.Net.BCrypt.Verify(password, user.MatKhau);
+            return Task.FromResult(BCrypt.Net.BCrypt.Verify(password, user.MatKhau));
         }
     }
 }

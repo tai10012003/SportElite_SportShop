@@ -108,6 +108,25 @@ export default {
     }
   },
 
+  async updateReview(id, updateData) {
+    try {
+      const res = await axios.put(`${API_URL}/ProductReviews/${id}`, updateData)
+      return res.data
+    } catch (error) {
+      console.error('Error updating review:', error)
+      throw new Error(error.response?.data?.message || 'Cập nhật đánh giá thất bại')
+    }
+  },
+
+  async deleteReview(id) {
+    try {
+      await axios.delete(`${API_URL}/ProductReviews/${id}`)
+    } catch (error) {
+      console.error('Error deleting review:', error)
+      throw new Error(error.response?.data?.message || 'Xóa đánh giá thất bại')
+    }
+  },
+
   async getRelatedProducts(slug) {
     try {
       const res = await axios.get(`${API_URL}/Product/related/${slug}`);

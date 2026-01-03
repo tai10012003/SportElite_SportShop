@@ -28,10 +28,8 @@
         <span class="price-old" v-if="product.giaKhuyenMai">{{ formatPrice(product.gia) }}₫</span>
       </div>
       <div class="product-rating">
-        <i v-for="i in 5" :key="i"
-           :class="['bi', i <= Math.floor(product.avg_rating || 0) ? 'bi-star-fill text-warning' : (i - (product.avg_rating || 0) <= 0.5 ? 'bi-star-half text-warning' : 'bi-star')]"
-           style="margin-left: 5px"></i>
-        <span class="rating-count">({{ (product.avg_rating || 0).toFixed(1) }} - {{ product.total_reviews || 0 }} đánh giá)</span>
+        <i v-for="i in 5" :key="i" :class="['bi', i <= Math.floor(product.averageRating || 0) ? 'bi-star-fill text-warning' : (i - (product.averageRating || 0) <= 0.5 ? 'bi-star-half text-warning' : 'bi-star')]"></i>
+        <span class="rating-count">({{ (product.averageRating || 0).toFixed(1) }}/5 - {{ product.totalReviews || 0 }} đánh giá)</span>
       </div>
     </div>
   </div>

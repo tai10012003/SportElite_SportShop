@@ -37,8 +37,8 @@
               </span>
             </div>
             <div class="product-rating">
-              <i v-for="i in 5" :key="i" :class="['bi', i <= (related.averageRating || 0) ? 'bi-star-fill text-warning' : (i - related.averageRating <= 0.5) ? 'bi-star-half text-warning' : 'bi-star']"></i>
-              <span class="rating-count">({{ (related.averageRating || 0).toFixed(1) }} - {{ related.totalReviews || 0 }} đánh giá)</span>
+              <i v-for="i in 5" :key="i" :class="['bi', i <= Math.floor(related.averageRating || 0) ? 'bi-star-fill text-warning' : (i - (related.averageRating || 0) <= 0.5 ? 'bi-star-half text-warning' : 'bi-star')]"></i>
+              <span class="rating-count">({{ (related.averageRating || 0).toFixed(1) }}/5 - {{ related.totalReviews || 0 }} đánh giá)</span>
             </div>
           </div>
         </div>
@@ -184,8 +184,6 @@ const calculateDiscountPercent = (original, discounted) => {
 
 .product-rating .rating-count {
   margin-left: 4px;
-  color: #666;
-  font-size: 0.85rem;
 }
 
 .product-badge {

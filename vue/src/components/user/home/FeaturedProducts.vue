@@ -25,7 +25,7 @@ const formatPrice = (price) => {
 const handleAddToCart = async (product) => {
   const cartCount = await addToCart(product.id)
   if (cartCount) {
-    // Update cart badge if needed
+    console.log('Cart updated, new count:', cartCount)
   }
 }
 </script>
@@ -65,8 +65,8 @@ const handleAddToCart = async (product) => {
                 <span class="price-old" v-if="product.giaKhuyenMai">{{ formatPrice(product.gia) }}₫</span>
               </div>
               <div class="product-rating">
-                <i v-for="n in 5" :key="n" :class="['bi', n <= Math.floor(product.avg_rating || 0) ? 'bi-star-fill' : n - (product.avg_rating || 0) <= 0.5 ? 'bi-star-half' : 'bi-star']" class="text-warning"></i>
-                <span class="rating-count"> ({{ (product.avg_rating || 0).toFixed(1) }} - {{ product.total_reviews || 0 }} đánh giá) </span>
+                <i v-for="i in 5" :key="i" :class="['bi', i <= Math.floor(product.averageRating || 0) ? 'bi-star-fill text-warning' : (i - (product.averageRating || 0) <= 0.5 ? 'bi-star-half text-warning' : 'bi-star')]"></i>
+                <span class="rating-count">({{ (product.averageRating || 0).toFixed(1) }}/5 - {{ product.totalReviews || 0 }} đánh giá)</span>
               </div>
             </div>
           </div>
@@ -107,8 +107,8 @@ const handleAddToCart = async (product) => {
 }
 
 .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
 }
 
 .product-card:hover img {
@@ -191,7 +191,6 @@ const handleAddToCart = async (product) => {
   right: 20px;
 }
 
-/* Animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
@@ -201,7 +200,6 @@ const handleAddToCart = async (product) => {
   animation: fadeInUp 1s ease-out;
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .product-card {
     height: 400px;
