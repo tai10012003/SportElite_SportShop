@@ -25,10 +25,10 @@ namespace WebService.Models
         [Column("mo_ta_chi_tiet", TypeName = "nvarchar(max)")]
         public string? MoTaChiTiet { get; set; }
 
-        [Column("kich_thuoc", TypeName = "nvarchar(30)")]
+        [Column("kich_thuoc", TypeName = "nvarchar(100)")]
         public string? KichThuoc { get; set; }
 
-        [Column("mau_sac", TypeName = "nvarchar(30)")]
+        [Column("mau_sac", TypeName = "nvarchar(100)")]
         public string? MauSac { get; set; }
 
         [Column("chat_lieu", TypeName = "nvarchar(100)")]
