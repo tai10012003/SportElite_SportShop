@@ -76,47 +76,45 @@
               -{{ Math.round(((product.gia - product.giaKhuyenMai) / product.gia) * 100) }}%
             </span>
           </div>
-          <form v-if="product.tinhTrang && product.soLuong > 0" @submit.prevent="addToCart" class="detail-add-cart-form">
+          <form v-if="product.tinhTrang && product.soLuong > 0" @submit.prevent class="detail-add-cart-form">
             <input type="hidden" name="product_id" :value="product.id">
             <div class="detail-quantity-control">
               <label class="detail-quantity-label">Số lượng:</label>
               <div class="input-group">
-                <button type="button" class="btn btn-outline-secondary" @click="updateQuantity('decrease')">-</button>
-                <input type="number" class="form-control text-center" v-model="quantity" min="1" :max="product.soLuong">
-                <button type="button" class="btn btn-outline-secondary" @click="updateQuantity('increase')">+</button>
+                <button type="button" @click="updateQuantity('decrease')" class="btn-quantity">-</button>
+                <input type="number" v-model="quantity" min="1" :max="product.soLuong" class="quantity-input">
+                <button type="button" @click="updateQuantity('increase')" class="btn-quantity">+</button>
               </div>
               <span class="detail-stock-info">(Còn {{ product.soLuong }} sản phẩm)</span>
             </div>
             <div class="product-variations mt-4 mb-4" v-if="product.mauSac || product.kichThuoc">
               <div class="variation-group mb-4" v-if="product.mauSac">
-                <label class="form-label">Màu sắc:</label>
+                <label class="form-label">Màu sắc: <span class="text-danger">*</span> <span v-if="selectedColor" class="selected-text">({{ selectedColor }})</span></label>
                 <div class="color-options">
                   <div v-for="(color, index) in getColors" :key="index" class="color-option">
                     <input type="radio" 
-                          :id="'color_' + color.trim()" 
-                          :value="color.trim()"
-                          v-model="selectedColor" 
-                          class="color-radio"
-                          required>
+                      :id="'color_' + color.trim()" 
+                      :value="color.trim()"
+                      v-model="selectedColor" 
+                      class="color-radio">
                     <label :for="'color_' + color.trim()" 
-                          class="color-label"
-                          :style="getColorStyle(color.trim())"
-                          :title="color.trim()">
+                      class="color-label"
+                      :style="getColorStyle(color.trim())"
+                      :title="color.trim()">
                       <span class="color-name">{{ color.trim() }}</span>
                     </label>
                   </div>
                 </div>
               </div>
               <div class="variation-group" v-if="product.kichThuoc">
-                <label class="form-labels">Kích thước:</label>
+                <label class="form-labels">Kích thước: <span class="text-danger">*</span> <span v-if="selectedSize" class="selected-text">({{ selectedSize }})</span></label>
                 <div class="size-options">
                   <div v-for="(size, index) in getSizes" :key="index" class="size-option">
                     <input type="radio" 
-                          :id="'size_' + size.trim()" 
-                          :value="size.trim()"
-                          v-model="selectedSize" 
-                          class="size-radio"
-                          required>
+                      :id="'size_' + size.trim()" 
+                      :value="size.trim()"
+                      v-model="selectedSize" 
+                      class="size-radio">
                     <label :for="'size_' + size.trim()" class="size-label">
                       {{ size.trim() }}
                     </label>
@@ -124,8 +122,12 @@
                 </div>
               </div>
             </div>
+            <div v-if="validationError" class="alert alert-danger validation-error" role="alert">
+              <i class="bi bi-exclamation-circle-fill me-2"></i>
+              {{ validationError }}
+            </div>
             <div class="detail-buttons">
-              <button type="submit" class="detail-add-to-cart">
+              <button @click="addToCart" class="detail-add-to-cart">
                 <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
               </button>
               <button type="button" class="detail-add-to-wishlist">
@@ -160,6 +162,7 @@
 <script setup>
 import { ref, onMounted, computed  } from 'vue'
 import { getColorStyle } from '@/assets/js/colorMap'
+import { useCartStore } from '@/stores/cart'
 
 const props = defineProps({
   product: {
@@ -177,9 +180,11 @@ const mainImage = ref('')
 const quantity = ref(1)
 const selectedColor = ref('')
 const selectedSize = ref('')
+const validationError = ref('')
 const currentImageIndex = ref(0)
 const currentSlide = ref(0)
 const thumbnailContainer = ref(null)
+const cartStore = useCartStore()
 
 const changeMainImage = (src, index) => {
   mainImage.value = src
@@ -192,27 +197,55 @@ const slideThumbnails = (direction) => {
   } else if (direction == 'prev' && currentSlide.value > 0) {
     currentSlide.value--
   }
-  
   const offset = currentSlide.value * 100
   thumbnailContainer.value.style.transform = `translateX(-${offset}%)`
 }
 
 const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price)
+
 const updateQuantity = (action) => {
   const max = parseInt(product.soLuong)
   if (action == 'increase' && quantity.value < max) quantity.value++
   else if (action == 'decrease' && quantity.value > 1) quantity.value--
 }
 
+const stockQuantity = computed(() => parseInt(product.soLuong) || 0)
+
 const addToCart = () => {
-  console.log('Adding to cart:', {
-    productId: product.id,
-    quantity: quantity.value,
-    color: selectedColor.value,
-    size: selectedSize.value
-  })
-  alert('Đã thêm vào giỏ hàng: ' + product.tenSanPham)
+  validationError.value = ''
+  const hasColor = product.mauSac && product.mauSac.trim() !== ''
+  const hasSize = product.kichThuoc && product.kichThuoc.trim() !== ''
+  if (hasColor && !selectedColor.value && hasSize && !selectedSize.value) {
+    validationError.value = 'Vui lòng chọn màu sắc và kích thước!'
+    return
+  }
+  if (hasColor && !selectedColor.value) {
+    validationError.value = 'Vui lòng chọn màu sắc!'
+    return
+  }
+  if (hasSize && !selectedSize.value) {
+    validationError.value = 'Vui lòng chọn kích thước!'
+    return
+  }
+  if (quantity.value < 1) {
+    validationError.value = 'Số lượng phải ít nhất là 1!'
+    return
+  }
+  if (quantity.value > stockQuantity.value) {
+    validationError.value = `Số lượng không được vượt quá số lượng tồn kho (${stockQuantity.value} sản phẩm)!`
+    return
+  }
+  cartStore.addItem(product, selectedColor.value, selectedSize.value, quantity.value)
+  const details = []
+  if (selectedColor.value) details.push(`Màu: ${selectedColor.value}`)
+  if (selectedSize.value) details.push(`Size: ${selectedSize.value}`)
+  const detailsText = details.length > 0 ? ` (${details.join(', ')})` : ''
+  alert(`✓ Đã thêm vào giỏ hàng: ${quantity.value} x ${product.tenSanPham}${detailsText}`)
+  selectedColor.value = ''
+  selectedSize.value = ''
+  quantity.value = 1
 }
+
 const getColors = computed(() => {
   return product.mauSac ? product.mauSac.split(',').map(c => c.trim()) : []
 })
@@ -367,7 +400,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 0;
   border-bottom: 1px solid rgba(0,0,0,0.05);
   transition: background-color 0.3s ease;
 }
@@ -389,7 +422,8 @@ onMounted(() => {
 
 .detail-quantity-control {
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1.8rem;
   border-radius: 12px;
   margin: 2rem 0;
 }
@@ -402,28 +436,44 @@ onMounted(() => {
 }
 
 .input-group {
-  max-width: 150px;
+  max-width: 130px;
 }
 
-.input-group .btn {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  color: #2c3e50;
-  padding: 0.3rem 1.2rem;
-  font-weight: 600;
+.btn-quantity {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.input-group .btn:hover {
-  background: #f8f9fa;
-  color: #0d6efd;
+.btn-quantity:hover {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
 }
 
-.input-group .form-control {
-  border: 1px solid #dee2e6;
+.quantity-input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.25rem;
   font-weight: 600;
-  color: #2c3e50;
-  padding: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .detail-stock-info {
@@ -453,11 +503,10 @@ onMounted(() => {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  align-items: center;
 }
 
 .detail-price-wrapper .form-label {
-  margin-top: 2px;
+  margin: 4px 0;
   font-weight: 500;
   color: var(--dark-color);
 }
@@ -567,6 +616,12 @@ onMounted(() => {
   color: var(--dark-color);
 }
 
+.selected-text {
+  color: #3b82f6;
+  font-weight: 700;
+  margin-left: 0.5rem
+}
+
 .color-label {
   display: block;
   width: 40px;
@@ -626,6 +681,22 @@ onMounted(() => {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+.validation-error {
+  animation: shake 0.5s ease-in-out;
+  border-left: 4px solid #dc3545;
+  background: #fff5f5;
+  color: #dc3545;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
 .detail-buttons {
   display: flex;
   gap: 1rem;
