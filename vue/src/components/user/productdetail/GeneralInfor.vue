@@ -89,7 +89,9 @@
             </div>
             <div class="product-variations mt-4 mb-4" v-if="product.mauSac || product.kichThuoc">
               <div class="variation-group mb-4" v-if="product.mauSac">
-                <label class="form-label">Màu sắc: <span class="text-danger">*</span> <span v-if="selectedColor" class="selected-text">({{ selectedColor }})</span></label>
+                <label class="form-label">Màu sắc: <span class="text-danger">*</span>
+                  <!-- <span v-if="selectedColor" class="selected-text">({{ selectedColor }})</span> -->
+                </label>
                 <div class="color-options">
                   <div v-for="(color, index) in getColors" :key="index" class="color-option">
                     <input type="radio" 
@@ -107,7 +109,9 @@
                 </div>
               </div>
               <div class="variation-group" v-if="product.kichThuoc">
-                <label class="form-labels">Kích thước: <span class="text-danger">*</span> <span v-if="selectedSize" class="selected-text">({{ selectedSize }})</span></label>
+                <label class="form-labels">Kích thước: <span class="text-danger">*</span>
+                  <!-- <span v-if="selectedSize" class="selected-text">({{ selectedSize }})</span> -->
+                </label>
                 <div class="size-options">
                   <div v-for="(size, index) in getSizes" :key="index" class="size-option">
                     <input type="radio" 

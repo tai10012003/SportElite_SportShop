@@ -8,19 +8,19 @@
         <img :src="getImagePath(product)" :alt="product.tenSanPham" class="img-fluid">
       </router-link>
       <div class="product-actions">
-        <button class="btn btn-light btn-sm" @click="$emit('add-to-cart', product)">
+        <button class="btn btn-light btn-sm" @click="openQuickAddModal" title="Thêm vào giỏ">
           <i class="bi bi-cart-plus"></i>
         </button>
-        <button class="btn btn-light btn-sm">
+        <button class="btn btn-light btn-sm" title="Yêu thích">
           <i class="bi bi-heart"></i>
         </button>
-        <router-link :to="`/san-pham/` + product.slug" class="btn btn-light btn-sm">
+        <router-link :to="`/san-pham/` + product.slug" class="btn btn-light btn-sm" title="Xem chi tiết">
           <i class="bi bi-eye"></i>
         </router-link>
       </div>
     </div>
     <div class="product-info">
-      <router-link :to="`/san-pham/`" class="text-decoration-none">
+      <router-link :to="`/san-pham/${product.slug}`" class="text-decoration-none">
         <h3 class="product-title">{{ product.tenSanPham }}</h3>
       </router-link>
       <div class="product-price">
@@ -32,11 +32,22 @@
         <span class="rating-count">({{ (product.averageRating || 0).toFixed(1) }}/5 - {{ product.totalReviews || 0 }} đánh giá)</span>
       </div>
     </div>
+    <QuickAddModal 
+      :is-open="isModalOpen" 
+      :product="product"
+      @close="closeModal"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import QuickAddModal from './QuickAddProductToCart.vue'
+
 defineProps(['product'])
+
+const isModalOpen = ref(false)
+
 const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price)
 
 const getImagePath = (product) => {
@@ -44,6 +55,14 @@ const getImagePath = (product) => {
   if (!product.hinhAnh || product.hinhAnh.length === 0) return '/images/products/no-image.jpg'
   const mainImage = product.hinhAnh.find(img => img.anhChinh) || product.hinhAnh[0]
   return mainImage ? `/uploads/products/${mainImage.duongDan}` : '/images/products/no-image.jpg'
+}
+
+const openQuickAddModal = () => {
+  isModalOpen.value = true
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
 }
 </script>
 
@@ -158,7 +177,6 @@ const getImagePath = (product) => {
   right: 20px;
 }
 
-/* Animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
@@ -181,6 +199,16 @@ const getImagePath = (product) => {
   }
   .product-price {
     font-size: 1rem;
+  }
+  
+  .product-actions {
+    opacity: 1;
+    right: 10px;
+  }
+  
+  .product-actions .btn {
+    width: 36px;
+    height: 36px;
   }
 }
 </style>

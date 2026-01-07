@@ -97,6 +97,11 @@ function logout() {
                   </router-link>
                 </li>
                 <li>
+                  <router-link class="dropdown-item" to="/san-pham-yeu-thic">
+                    <i class="bi bi-heart me-2"></i>Sản phẩm yêu thích
+                  </router-link>
+                </li>
+                <li>
                   <router-link class="dropdown-item" to="/don-hang">
                     <i class="bi bi-bag me-2"></i>Đơn hàng
                   </router-link>

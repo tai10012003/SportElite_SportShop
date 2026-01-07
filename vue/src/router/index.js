@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
+import Home from '@/views/Home.vue'
 import About from '@/views/About.vue'
 import Product from '@/views/Product.vue'
 import Login from '@/views/Login.vue'
@@ -7,6 +7,7 @@ import Register from '@/views/Register.vue'
 import Profile from '@/views/Profile.vue'
 import AuthService from '@/services/AuthService'
 import ProductDetail from '@/views/ProductDetail.vue'
+import Cart from '@/views/Cart.vue'
 
 const routes = [
   {
@@ -29,6 +30,11 @@ const routes = [
     name: 'ProductDetail',
     component: ProductDetail,
     props: true
+  },
+  {
+    path: '/gio-hang',
+    name: 'Cart',
+    component: Cart
   },
   {
     path: '/dang-nhap',
