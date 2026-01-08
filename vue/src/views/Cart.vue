@@ -72,6 +72,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import Swal from 'sweetalert2'
 import { useCartStore } from '@/stores/cart'
 import CartItem from '@/components/cart/CartItem.vue'
 
@@ -87,9 +88,26 @@ const totalAmount = computed(() => {
 
 const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price)
 
-const clearAll = () => {
-  if (confirm('Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?')) {
+const clearAll = async () => {
+  const result = await Swal.fire({
+    icon: 'warning',
+    title: 'Xóa toàn bộ giỏ hàng?',
+    html: `
+      <p>Bạn có chắc muốn <strong>xóa tất cả sản phẩm</strong> trong giỏ hàng?</p>
+      <p style="color:#e74c3c; font-weight:600;">Hành động này không thể hoàn tác.</p>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Xóa tất cả',
+    cancelButtonText: 'Hủy',
+    confirmButtonColor: '#dc3545'
+  })
+  if (result.isConfirmed) {
     cartStore.clearCart()
+    await Swal.fire({
+      icon: 'success',
+      title: 'Đã xóa giỏ hàng',
+      text: 'Tất cả sản phẩm đã được xóa khỏi giỏ hàng.'
+    })
   }
 }
 </script>

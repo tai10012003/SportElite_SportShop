@@ -136,6 +136,7 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import Swal from 'sweetalert2'
 import AuthService from '@/services/AuthService'
 import ProductService from '@/services/ProductService'
 import { Modal } from 'bootstrap'
@@ -226,7 +227,20 @@ function openReportModal(review) {
 }
 
 function submitReport() {
-  alert(`Đã gửi báo cáo với lý do: "${selectedReportReason.value}"\n(Cảm ơn bạn đã góp phần giữ cộng đồng sạch đẹp!)`)
+  Swal.fire({
+    icon: 'success',
+    title: 'Đã gửi báo cáo',
+    html: `
+      <div style="line-height:1.6">
+        <strong>Lý do:</strong> "${selectedReportReason.value}"<br/>
+        <span style="color:#6b7280; font-size:15px;">
+          Cảm ơn bạn đã góp phần giữ cộng đồng sạch đẹp!
+        </span>
+      </div>
+    `,
+    confirmButtonText: 'Ok',
+    confirmButtonColor: '#2563eb'
+  })
   const modalEl = document.getElementById('reportModal')
   const modal = Modal.getInstance(modalEl)
   modal.hide()
@@ -246,40 +260,65 @@ function cancelEdit(review) {
 
 const saveEdit = async (review) => {
   if (!review.editingRating || !review.editingComment.trim()) {
-    alert('Vui lòng nhập đầy đủ đánh giá và nội dung!')
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Thiếu thông tin',
+      text: 'Vui lòng nhập đầy đủ đánh giá và nội dung!'
+    })
     return
   }
   isSubmitting.value = true
   try {
-    const updatePayload = {
+    await ProductService.updateReview(review.id, {
       diemDanhGia: review.editingRating,
       noiDung: review.editingComment.trim()
-    }
-    await ProductService.updateReview(review.id, updatePayload)
+    })
     review.diemDanhGia = review.editingRating
     review.noiDung = review.editingComment.trim()
     review.isEditing = false
-    alert('Cập nhật đánh giá thành công!')
+    await Swal.fire({
+      icon: 'success',
+      title: 'Cập nhật đánh giá thành công',
+      text: 'Đánh giá của bạn đã được cập nhật thành công!'
+    })
     emit('review-updated')
   } catch (error) {
-    alert(error.message || 'Cập nhật thất bại!')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Cập nhật thất bại',
+      text: error.message || 'Vui lòng thử lại.'
+    })
   } finally {
     isSubmitting.value = false
   }
 }
 
 const deleteReview = async (review) => {
-  if (!confirm('Bạn có chắc muốn xóa đánh giá này?')) return
-
+  const result = await Swal.fire({
+    icon: 'warning',
+    title: 'Xóa đánh giá?',
+    text: 'Bạn có chắc chắn muốn xóa đánh giá này?',
+    showCancelButton: true,
+    confirmButtonText: 'Xóa',
+    cancelButtonText: 'Hủy',
+    confirmButtonColor: '#ef4444'
+  })
+  if (!result.isConfirmed) return
   isSubmitting.value = true
   try {
     await ProductService.deleteReview(review.id)
-    const index = props.reviews.findIndex(r => r.id === review.id)
-    if (index !== -1) props.reviews.splice(index, 1)
-    alert('Xóa đánh giá thành công!')
     emit('review-deleted')
+    await Swal.fire({
+      icon: 'success',
+      title: 'Xóa đánh giá thành công',
+      text: 'Đánh giá của bạn đã bị xóa thành công!'
+    })
   } catch (error) {
-    alert(error.message || 'Xóa thất bại!')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Xóa thất bại',
+      text: error.message || 'Vui lòng thử lại.'
+    })
   } finally {
     isSubmitting.value = false
   }
@@ -289,43 +328,62 @@ const submitReview = async () => {
   if (isSubmitting.value) return
   isSubmitting.value = true
   if (!newReview.value.rating) {
-    alert('Vui lòng chọn số sao đánh giá!')
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Thiếu đánh giá',
+      text: 'Vui lòng chọn số sao đánh giá!'
+    })
     isSubmitting.value = false
     return
   }
   if (!newReview.value.comment.trim()) {
-    alert('Vui lòng nhập nhận xét!')
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Thiếu nhận xét',
+      text: 'Vui lòng nhập nhận xét của bạn!'
+    })
     isSubmitting.value = false
     return
   }
   const user = currentUser.value
   if (!user || !user.maNguoiDung) {
-    alert('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Lỗi đăng nhập',
+      text: 'Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.'
+    })
     isSubmitting.value = false
     return
   }
-  const reviewPayload = {
-    maSanPham: props.product.maSanPham,
-    maNguoiDung: user.maNguoiDung,
-    diemDanhGia: newReview.value.rating,
-    noiDung: newReview.value.comment.trim()
-  }
   try {
+    const reviewPayload = {
+      maSanPham: props.product.maSanPham,
+      maNguoiDung: user.maNguoiDung,
+      diemDanhGia: newReview.value.rating,
+      noiDung: newReview.value.comment.trim()
+    }
     const newReviewFromServer = await ProductService.submitReview(reviewPayload)
-    const formattedReview = {
+    emit('review-added', {
       id: newReviewFromServer.id,
-      hoTen: user.hoTen || "Người dùng",
+      hoTen: user.hoTen || 'Người dùng',
       maNguoiDung: user.maNguoiDung,
       diemDanhGia: newReviewFromServer.diemDanhGia,
       noiDung: newReviewFromServer.noiDung,
       ngayTao: newReviewFromServer.ngayTao
-    }
-    emit('review-added', formattedReview)
+    })
     newReview.value.rating = 0
     newReview.value.comment = ''
-    alert('Gửi đánh giá thành công!')
+    await Swal.fire({
+      icon: 'success',
+      title: 'Gửi đánh giá thành công 🎉',
+      text: 'Cảm ơn bạn đã chia sẻ trải nghiệm!'
+    })
   } catch (error) {
-    alert(error.message || 'Gửi đánh giá thất bại. Vui lòng thử lại!')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Gửi đánh giá thất bại',
+      text: error.message || 'Vui lòng thử lại sau.'
+    })
   } finally {
     isSubmitting.value = false
   }

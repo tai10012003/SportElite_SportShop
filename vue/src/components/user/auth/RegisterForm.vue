@@ -9,17 +9,10 @@
           <i class="bi bi-person-plus-fill"></i> Đăng ký
         </button>
       </div>
-
       <div class="auth-form-container">
         <form @submit.prevent="handleSubmit" class="auth-form">
           <h2 class="auth-title">Đăng ký tài khoản</h2>
           <p class="auth-subtitle">Tham gia cùng Sport Elite ngay hôm nay!</p>
-
-          <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ error }}
-            <button type="button" class="btn-close" @click="error = ''"></button>
-          </div>
-
           <div class="form-group">
             <label for="username">Tên đăng nhập</label>
             <div class="input-group" :class="{ 'error': v$.tenDangNhap.$error }">
@@ -36,7 +29,6 @@
               {{ v$.tenDangNhap.$errors[0].$message }}
             </div>
           </div>
-
           <div class="form-group">
             <label for="hoTen">Họ và tên</label>
             <div class="input-group" :class="{ 'error': v$.hoTen.$error }">
@@ -53,7 +45,6 @@
               {{ v$.hoTen.$errors[0].$message }}
             </div>
           </div>
-
           <div class="form-group">
             <label for="email">Email</label>
             <div class="input-group" :class="{ 'error': v$.email.$error }">
@@ -70,7 +61,6 @@
               {{ v$.email.$errors[0].$message }}
             </div>
           </div>
-
           <div class="form-group">
             <label for="soDienThoai">Số điện thoại</label>
             <div class="input-group">
@@ -83,7 +73,6 @@
               >
             </div>
           </div>
-
           <div class="form-group">
             <label for="diaChi">Địa chỉ</label>
             <div class="input-group">
@@ -96,7 +85,6 @@
               >
             </div>
           </div>
-
           <div class="form-group">
             <label for="password">Mật khẩu</label>
             <div class="input-group" :class="{ 'error': v$.matKhau.$error }">
@@ -118,7 +106,6 @@
               {{ v$.matKhau.$errors[0].$message }}
             </div>
           </div>
-
           <div class="form-group">
             <label for="confirmPassword">Nhập lại mật khẩu</label>
             <div class="input-group" :class="{ 'error': v$.confirmPassword.$error }">
@@ -140,7 +127,6 @@
               {{ v$.confirmPassword.$errors[0].$message }}
             </div>
           </div>
-
           <button 
             type="submit" 
             class="auth-button" 
@@ -150,7 +136,6 @@
             <i class="bi" :class="loading ? 'bi-arrow-repeat spin' : 'bi-person-plus'"></i>
             {{ loading ? 'Đang đăng ký...' : 'Đăng ký' }}
           </button>
-
           <div class="auth-footer">
             <p>Đã có tài khoản? <router-link to="/dang-nhap">Đăng nhập ngay</router-link></p>
           </div>
@@ -163,6 +148,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, sameAs } from '@vuelidate/validators'
 import AuthService from '@/services/AuthService'
@@ -200,14 +186,15 @@ const rules = {
 const v$ = useVuelidate(rules, form)
 
 async function handleSubmit() {
-  error.value = ''
-  
   const isFormCorrect = await v$.value.$validate()
   if (!isFormCorrect) {
-    error.value = 'Vui lòng kiểm tra lại thông tin'
+    Swal.fire({
+      icon: 'warning',
+      title: 'Thông tin chưa hợp lệ',
+      text: 'Vui lòng kiểm tra lại các trường đã nhập'
+    })
     return
   }
-
   try {
     loading.value = true
     await AuthService.register({
@@ -218,19 +205,19 @@ async function handleSubmit() {
       diaChi: form.diaChi || null,
       matKhau: form.matKhau
     })
-
-    Object.keys(form).forEach(key => form[key] = '')
-    v$.value.$reset()
-    router.push({
-      path: '/dang-nhap',
-      query: { 
-        registered: 'true',
-        email: form.email 
-      }
+    await Swal.fire({
+      icon: 'success',
+      title: 'Đăng ký thành công',
+      text: 'Bạn có thể đăng nhập ngay bây giờ',
+      confirmButtonText: 'Đăng nhập'
     })
+    router.push('/dang-nhap')
   } catch (err) {
-    error.value = err?.message || 'Đăng ký thất bại. Vui lòng thử lại.'
-    console.error('Registration error:', err)
+    Swal.fire({
+      icon: 'error',
+      title: 'Đăng ký thất bại',
+      text: err?.message || 'Vui lòng thử lại sau'
+    })
   } finally {
     loading.value = false
   }
@@ -241,12 +228,11 @@ function goToLogin() {
 }
 
 function goToRegister() {
-    router.push('/dang-ky')
+  router.push('/dang-ky')
 }
 </script>
 
 <style scoped>
-
 .auth-wrapper {
   display: flex;
   align-items: center;

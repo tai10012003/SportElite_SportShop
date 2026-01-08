@@ -217,8 +217,8 @@ const calculateDiscountPercent = (original, discounted) => {
 }
 
 .product-actions .btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;

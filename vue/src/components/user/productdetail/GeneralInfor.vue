@@ -126,10 +126,6 @@
                 </div>
               </div>
             </div>
-            <div v-if="validationError" class="alert alert-danger validation-error" role="alert">
-              <i class="bi bi-exclamation-circle-fill me-2"></i>
-              {{ validationError }}
-            </div>
             <div class="detail-buttons">
               <button @click="addToCart" class="detail-add-to-cart">
                 <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
@@ -165,6 +161,8 @@
 
 <script setup>
 import { ref, onMounted, computed  } from 'vue'
+import Swal from 'sweetalert2'
+import { useRouter } from 'vue-router'
 import { getColorStyle } from '@/assets/js/colorMap'
 import { useCartStore } from '@/stores/cart'
 
@@ -179,12 +177,12 @@ const props = defineProps({
   }
 })
 
+const router = useRouter()
 const product = props.product
 const mainImage = ref('')
 const quantity = ref(1)
 const selectedColor = ref('')
 const selectedSize = ref('')
-const validationError = ref('')
 const currentImageIndex = ref(0)
 const currentSlide = ref(0)
 const thumbnailContainer = ref(null)
@@ -215,39 +213,128 @@ const updateQuantity = (action) => {
 
 const stockQuantity = computed(() => parseInt(product.soLuong) || 0)
 
-const addToCart = () => {
-  validationError.value = ''
+const addToCart = async () => {
   const hasColor = product.mauSac && product.mauSac.trim() !== ''
   const hasSize = product.kichThuoc && product.kichThuoc.trim() !== ''
   if (hasColor && !selectedColor.value && hasSize && !selectedSize.value) {
-    validationError.value = 'Vui lòng chọn màu sắc và kích thước!'
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Thiếu lựa chọn',
+      text: 'Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng.',
+      confirmButtonText: 'Ok'
+    })
     return
   }
   if (hasColor && !selectedColor.value) {
-    validationError.value = 'Vui lòng chọn màu sắc!'
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Chưa chọn màu sắc',
+      text: 'Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng.',
+      confirmButtonText: 'Ok'
+    })
     return
   }
   if (hasSize && !selectedSize.value) {
-    validationError.value = 'Vui lòng chọn kích thước!'
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Chưa chọn kích thước',
+      text: 'Vui lòng chọn kích thước trước khi thêm vào giỏ hàng.',
+      confirmButtonText: 'Ok'
+    })
     return
   }
   if (quantity.value < 1) {
-    validationError.value = 'Số lượng phải ít nhất là 1!'
+    await Swal.fire({
+      icon: 'error',
+      title: 'Số lượng không hợp lệ',
+      text: 'Số lượng phải ít nhất là 1 sản phẩm.',
+      confirmButtonText: 'OK'
+    })
     return
   }
   if (quantity.value > stockQuantity.value) {
-    validationError.value = `Số lượng không được vượt quá số lượng tồn kho (${stockQuantity.value} sản phẩm)!`
+    await Swal.fire({
+      icon: 'error',
+      title: 'Vượt quá tồn kho',
+      text: `Số lượng tối đa có thể mua là ${stockQuantity.value} sản phẩm.`,
+      confirmButtonText: 'OK'
+    })
     return
   }
-  cartStore.addItem(product, selectedColor.value, selectedSize.value, quantity.value)
-  const details = []
-  if (selectedColor.value) details.push(`Màu: ${selectedColor.value}`)
-  if (selectedSize.value) details.push(`Size: ${selectedSize.value}`)
-  const detailsText = details.length > 0 ? ` (${details.join(', ')})` : ''
-  alert(`✓ Đã thêm vào giỏ hàng: ${quantity.value} x ${product.tenSanPham}${detailsText}`)
+  cartStore.addItem(
+    product,
+    selectedColor.value,
+    selectedSize.value,
+    quantity.value
+  )
+  await Swal.fire({
+    icon: 'success',
+    title: 'Đã thêm sản phẩm vào giỏ hàng 🎉',
+    html: `
+      <div style="
+        text-align:center;
+        line-height:1.7;
+        background:#f8f9ff;
+        border-radius:12px;
+        padding:16px 18px;
+        font-size:15px;
+      ">
+        <div style="margin-bottom:12px;">
+          <strong style="font-size:16px; color:#111827;">
+            ${product.tenSanPham}
+          </strong>
+        </div>
+        <div style="
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:10px;
+        ">
+          <div style="
+            width:220px;
+            background:#ffffff;
+            padding:8px 12px;
+            border-radius:10px;
+            border:1px solid #e5e7eb;
+            text-align:left;
+          ">
+            <strong>Số lượng:</strong> ${quantity.value}
+          </div>
+          ${selectedColor.value ? `
+            <div style="
+              width:220px;
+              background:#ffffff;
+              padding:8px 12px;
+              border-radius:10px;
+              border:1px solid #e5e7eb;
+              text-align:left;
+            ">
+              <strong>Màu sắc:</strong> ${selectedColor.value}
+            </div>
+          ` : ''}
+          ${selectedSize.value ? `
+            <div style="
+              width:220px;
+              background:#ffffff;
+              padding:8px 12px;
+              border-radius:10px;
+              border:1px solid #e5e7eb;
+              text-align:left;
+            ">
+              <strong>Kích thước:</strong> ${selectedSize.value}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `,
+    timer: 2800,
+    timerProgressBar: true,
+    showConfirmButton: false
+  })
   selectedColor.value = ''
   selectedSize.value = ''
   quantity.value = 1
+  router.push('/gio-hang')
 }
 
 const getColors = computed(() => {
@@ -683,17 +770,6 @@ onMounted(() => {
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.validation-error {
-  animation: shake 0.5s ease-in-out;
-  border-left: 4px solid #dc3545;
-  background: #fff5f5;
-  color: #dc3545;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin: 1rem 0;
-  font-weight: 500;
 }
 
 @keyframes shake {

@@ -13,12 +13,6 @@
         <form @submit.prevent="handleSubmit" class="auth-form">
           <h2 class="auth-title">Đăng nhập Sport Elite</h2>
           <p class="auth-subtitle">Chào mừng bạn trở lại! Vui lòng đăng nhập để tiếp tục.</p>
-
-          <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ error }}
-            <button type="button" class="btn-close" @click="error = ''"></button>
-          </div>
-
           <div class="form-group">
             <label for="email">Email</label>
             <div class="input-group" :class="{ 'error': v$.email.$error }">
@@ -35,7 +29,6 @@
               {{ v$.email.$errors[0].$message }}
             </div>
           </div>
-
           <div class="form-group">
             <label for="password">Mật khẩu</label>
             <div class="input-group" :class="{ 'error': v$.password.$error }">
@@ -57,7 +50,6 @@
               {{ v$.password.$errors[0].$message }}
             </div>
           </div>
-
           <div class="form-options">
             <label class="remember-me">
               <input type="checkbox" class="checkbox" v-model="form.remember">
@@ -71,11 +63,9 @@
             <i class="bi bi-box-arrow-in-right"></i>
             {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
           </button>
-
           <div class="social-divider">
             <span>Hoặc đăng nhập với</span>
           </div>
-
           <div class="social-buttons">
             <button type="button" class="social-button google" @click="loginWithGoogle">
               <img src="@/assets/images/auth/google.png" width="24" height="24" alt="Google">
@@ -86,7 +76,6 @@
               Facebook
             </button>
           </div>
-
           <div class="auth-footer">
             <p>Chưa có tài khoản? <router-link to="/register">Đăng ký ngay</router-link></p>
           </div>
@@ -99,6 +88,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength } from '@vuelidate/validators'
 import AuthService from '@/services/AuthService'
@@ -124,13 +114,23 @@ const v$ = useVuelidate(rules, form)
 async function handleSubmit() {
   const isFormCorrect = await v$.value.$validate()
   if (!isFormCorrect) return
-
   try {
     loading.value = true
     await AuthService.login(form)
+    await Swal.fire({
+      icon: 'success',
+      title: 'Đăng nhập thành công',
+      text: 'Chào mừng bạn quay trở lại Sport Elite!',
+      timer: 1500,
+      showConfirmButton: false
+    })
     router.push('/')
   } catch (err) {
-    error.value = err?.message || 'Đăng nhập thất bại'
+    Swal.fire({
+      icon: 'error',
+      title: 'Đăng nhập thất bại',
+      text: err?.message || 'Email hoặc mật khẩu không đúng'
+    })
   } finally {
     loading.value = false
   }

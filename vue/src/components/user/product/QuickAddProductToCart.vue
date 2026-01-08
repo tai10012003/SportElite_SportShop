@@ -103,10 +103,6 @@
                       </div>
                     </div>
                   </div>
-                  <div v-if="validationError" class="validation-error">
-                    <i class="bi bi-exclamation-circle-fill"></i>
-                    {{ validationError }}
-                  </div>
                   <div class="modal-actions">
                     <button @click="addToCart" class="btn-add-cart">
                       <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
@@ -127,6 +123,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import Swal from 'sweetalert2'
 import { getColorStyle } from '@/assets/js/colorMap'
 import { useCartStore } from '@/stores/cart'
 
@@ -145,7 +142,6 @@ const currentImage = ref('')
 const quantity = ref(1)
 const selectedColor = ref('')
 const selectedSize = ref('')
-const validationError = ref('')
 
 const stockQuantity = computed(() => parseInt(props.product.soLuong) || 0)
 
@@ -165,7 +161,6 @@ watch(() => props.isOpen, (newVal) => {
     quantity.value = 1
     selectedColor.value = ''
     selectedSize.value = ''
-    validationError.value = ''
     if (props.product.images && props.product.images.length > 0) {
       currentImage.value = props.product.images[0]
     } else if (props.product.mainImage) {
@@ -197,18 +192,32 @@ const decreaseQuantity = () => {
   }
 }
 
-const addToCart = () => {
-  validationError.value = ''
+const addToCart = async () => {
   if (hasColors.value && !selectedColor.value) {
-    validationError.value = 'Vui lòng chọn màu sắc!'
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Chưa chọn màu sắc',
+      text: 'Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng.',
+      confirmButtonText: 'Ok'
+    })
     return
   }
   if (hasSizes.value && !selectedSize.value) {
-    validationError.value = 'Vui lòng chọn kích thước!'
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Chưa chọn kích thước',
+      text: 'Vui lòng chọn kích thước trước khi thêm vào giỏ hàng.',
+      confirmButtonText: 'Ok'
+    })
     return
   }
   if (quantity.value > stockQuantity.value) {
-    validationError.value = `Số lượng không được vượt quá số lượng tồn kho (${stockQuantity.value} sản phẩm)!`
+    await Swal.fire({
+      icon: 'error',
+      title: 'Vượt quá tồn kho',
+      text: `Số lượng tối đa có thể mua là ${stockQuantity.value} sản phẩm.`,
+      confirmButtonText: 'OK'
+    })
     return
   }
   cartStore.addItem(
@@ -217,7 +226,70 @@ const addToCart = () => {
     selectedSize.value,
     quantity.value
   )
-  alert(`✅ Đã thêm "${props.product.tenSanPham}" vào giỏ hàng!`)
+  await Swal.fire({
+    icon: 'success',
+    title: 'Đã thêm sản phẩm vào giỏ hàng 🎉',
+    html: `
+      <div style="
+        text-align:center;
+        line-height:1.7;
+        background:#f8f9ff;
+        border-radius:12px;
+        padding:16px 18px;
+        font-size:15px;
+      ">
+        <div style="margin-bottom:12px;">
+          <strong style="font-size:16px; color:#111827;">
+            ${props.product.tenSanPham}
+          </strong>
+        </div>
+        <div style="
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:10px;
+        ">
+          <div style="
+            width:220px;
+            background:#ffffff;
+            padding:8px 12px;
+            border-radius:10px;
+            border:1px solid #e5e7eb;
+            text-align:left;
+          ">
+            <strong>Số lượng:</strong> ${quantity.value}
+          </div>
+          ${selectedColor.value ? `
+            <div style="
+              width:220px;
+              background:#ffffff;
+              padding:8px 12px;
+              border-radius:10px;
+              border:1px solid #e5e7eb;
+              text-align:left;
+            ">
+              <strong>Màu sắc:</strong> ${selectedColor.value}
+            </div>
+          ` : ''}
+          ${selectedSize.value ? `
+            <div style="
+              width:220px;
+              background:#ffffff;
+              padding:8px 12px;
+              border-radius:10px;
+              border:1px solid #e5e7eb;
+              text-align:left;
+            ">
+              <strong>Kích thước:</strong> ${selectedSize.value}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `,
+    timer: 2800,
+    timerProgressBar: true,
+    showConfirmButton: false
+  })
   closeModal()
 }
 </script>
@@ -578,28 +650,10 @@ const addToCart = () => {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.validation-error {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #fff5f5;
-  color: #e74c3c;
-  padding: 0.875rem 1rem;
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  border-left: 4px solid #e74c3c;
-  font-weight: 500;
-  animation: shake 0.5s ease-in-out;
-}
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-8px); }
   75% { transform: translateX(8px); }
-}
-
-.validation-error i {
-  font-size: 1.2rem;
 }
 
 .modal-actions {

@@ -49,6 +49,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
+import Swal from 'sweetalert2'
 import { useCartStore } from '@/stores/cart'
 import { getColorStyle } from '@/assets/js/colorMap'
 
@@ -75,10 +76,26 @@ const handleInput = (e) => {
   }
 }
 
-const updateQuantity = (change) => {
-  let newQty = quantity.value + change
+const updateQuantity = async (change) => {
+  const newQty = quantity.value + change
   if (newQty < 1) {
-    if (confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'Xóa sản phẩm?',
+      text: 'Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?',
+      showCancelButton: true,
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+      confirmButtonColor: '#e74c3c'
+    })
+    if (result.isConfirmed) {
+      await Swal.fire({
+        icon: 'success',
+        title: 'Đã xóa sản phẩm',
+        text: 'Sản phẩm đã được xóa khỏi giỏ hàng.',
+        timer: 1500,
+        showConfirmButton: false
+      })
       cartStore.removeItem(props.itemKey)
     }
     return
@@ -92,8 +109,24 @@ const updateQuantityDirect = (newQty) => {
   quantity.value = newQty
 }
 
-const remove = () => {
-  if (confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+const remove = async () => {
+  const result = await Swal.fire({
+    icon: 'warning',
+    title: 'Xóa sản phẩm?',
+    text: 'Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?',
+    showCancelButton: true,
+    confirmButtonText: 'Xóa',
+    cancelButtonText: 'Hủy',
+    confirmButtonColor: '#e74c3c'
+  })
+  if (result.isConfirmed) {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Đã xóa sản phẩm',
+      text: 'Sản phẩm đã được xóa khỏi giỏ hàng.',
+      timer: 1500,
+      showConfirmButton: false
+    })
     cartStore.removeItem(props.itemKey)
   }
 }
