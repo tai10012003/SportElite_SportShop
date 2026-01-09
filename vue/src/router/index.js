@@ -8,6 +8,7 @@ import Profile from '@/views/Profile.vue'
 import AuthService from '@/services/AuthService'
 import ProductDetail from '@/views/ProductDetail.vue'
 import Cart from '@/views/Cart.vue'
+import Checkout from '@/views/Checkout.vue'
 
 const routes = [
   {
@@ -35,6 +36,11 @@ const routes = [
     path: '/gio-hang',
     name: 'Cart',
     component: Cart
+  },
+  {
+    path: '/thanh-toan',
+    name: 'Checkout',
+    component: Checkout
   },
   {
     path: '/dang-nhap',
