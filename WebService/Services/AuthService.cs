@@ -54,7 +54,8 @@ namespace WebService.Services
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Quyen ?? "user"),
                 new Claim(ClaimTypes.Name, user.HoTen ?? user.TenDangNhap),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.MaNguoiDung),
+                new Claim(JwtRegisteredClaimNames.Sub, user.MaNguoiDung),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };

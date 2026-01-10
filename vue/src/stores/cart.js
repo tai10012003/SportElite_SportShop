@@ -10,12 +10,13 @@ export const useCartStore = defineStore('cart', () => {
     const itemCount = computed(() => Object.keys(items.value).length)
 
     const addItem = (product, selectedColor = '', selectedSize = '', quantity = 1) => {
-        const itemKey = `${product.id}_${selectedColor}_${selectedSize}`
+        const itemKey = `${product.maSanPham}_${selectedColor}_${selectedSize}`
         if (items.value[itemKey]) {
             items.value[itemKey].quantity += quantity
         } else {
             items.value[itemKey] = {
                 id: product.id,
+                maSanPham: product.maSanPham,
                 itemKey,
                 name: product.tenSanPham,
                 price: product.giaKhuyenMai || product.gia,

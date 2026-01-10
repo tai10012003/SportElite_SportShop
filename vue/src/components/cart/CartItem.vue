@@ -10,7 +10,7 @@
               {{ item.name }}
             </router-link>
             <div class="product-sku">
-              Mã SP: {{ item.id }}
+              Mã SP: {{ item.maSanPham }}
             </div>
           </div>
       </div>

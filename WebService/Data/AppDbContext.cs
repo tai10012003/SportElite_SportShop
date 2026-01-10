@@ -13,6 +13,9 @@ namespace WebService.Data
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<ProductReview> ProductReviews { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +96,49 @@ namespace WebService.Data
             modelBuilder.Entity<User>()
                 .Property(u => u.NgayCapNhat)
                 .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Order>()
+                .HasAlternateKey(o => o.MaDonHang);
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.NgayTao)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.NgayCapNhat)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.NguoiDung)
+                .WithMany()
+                .HasForeignKey(o => o.MaNguoiDung)
+                .HasPrincipalKey(u => u.MaNguoiDung);
+
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.NgayTao)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.DonHang)
+                .WithMany(o => o.ChiTietDonHang)
+                .HasForeignKey(od => od.MaDonHang)
+                .HasPrincipalKey(o => o.MaDonHang);
+
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.SanPham)
+                .WithMany()
+                .HasForeignKey(od => od.MaSanPham)
+                .HasPrincipalKey(p => p.MaSanPham);
+
+            modelBuilder.Entity<OrderStatusHistory>()
+                .Property(osh => osh.ThoiGian)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<OrderStatusHistory>()
+                .HasOne(osh => osh.DonHang)
+                .WithMany(o => o.LichSuTrangThai)
+                .HasForeignKey(osh => osh.MaDonHang)
+                .HasPrincipalKey(o => o.MaDonHang);
         }
     }
 }

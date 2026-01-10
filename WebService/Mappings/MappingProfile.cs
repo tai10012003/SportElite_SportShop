@@ -5,6 +5,7 @@ using WebService.DTOs.Brands;
 using WebService.DTOs.ProductImages;
 using WebService.DTOs.Users;
 using WebService.DTOs.ProductReviews;
+using WebService.DTOs.Orders;
 using WebService.Models;
 
 namespace WebService.Mappings
@@ -62,6 +63,23 @@ namespace WebService.Mappings
                 .ForMember(dest => dest.MaNguoiDung, opt => opt.Ignore())
                 .ForMember(dest => dest.NgayTao, opt => opt.Ignore())
                 .ForMember(dest => dest.NgayCapNhat, opt => opt.MapFrom(_ => DateTime.Now));
+
+            CreateMap<Order, OrderResponseDto>()
+                .ForMember(dest => dest.MaDonHang, opt => opt.MapFrom(src => src.MaDonHang))
+                .ForMember(dest => dest.TamTinh, opt => opt.MapFrom(src => src.TamTinh))
+                .ForMember(dest => dest.SoTienGiam, opt => opt.MapFrom(src => src.SoTienGiam))
+                .ForMember(dest => dest.PhiVanChuyen, opt => opt.MapFrom(src => src.PhiVanChuyen))
+                .ForMember(dest => dest.TongThanhToan, opt => opt.MapFrom(src => src.TongThanhToan))
+                .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => src.TrangThai))
+                .ForMember(dest => dest.DaThanhToan, opt => opt.MapFrom(src => src.DaThanhToan))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ChiTietDonHang));
+            CreateMap<OrderDetail, OrderItemResponseDto>()
+                .ForMember(dest => dest.MaSanPham, opt => opt.MapFrom(src => src.MaSanPham))
+                .ForMember(dest => dest.TenSanPham, opt => opt.MapFrom(src => src.TenSanPham))
+                .ForMember(dest => dest.HinhAnh, opt => opt.MapFrom(src => src.HinhAnh))
+                .ForMember(dest => dest.DonGia, opt => opt.MapFrom(src => src.DonGia))
+                .ForMember(dest => dest.SoLuong, opt => opt.MapFrom(src => src.SoLuong))
+                .ForMember(dest => dest.ThanhTien, opt => opt.MapFrom(src => src.ThanhTien));   
         }
     }
 }
