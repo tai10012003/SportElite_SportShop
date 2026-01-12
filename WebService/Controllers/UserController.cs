@@ -50,10 +50,8 @@ namespace WebService.Controllers
                 var userIdStr = User.FindFirstValue("uid");
                 if (string.IsNullOrEmpty(userIdStr))
                     return Unauthorized(new { message = "Token không chứa thông tin người dùng" });
-
                 if (!int.TryParse(userIdStr, out var userId))
                     return Unauthorized(new { message = "user id trong token không hợp lệ" });
-
                 var profile = await _userService.GetProfileAsync(userId);
                 return Ok(profile);
             }
@@ -72,7 +70,6 @@ namespace WebService.Controllers
                 var userIdStr = User.FindFirstValue("uid");
                 if (string.IsNullOrEmpty(userIdStr))
                     return Unauthorized(new { message = "Token không chứa thông tin người dùng" });
-
                 if (!int.TryParse(userIdStr, out var userId))
                     return Unauthorized(new { message = "User id trong token không hợp lệ" });
                 var result = await _userService.UpdateProfileAsync(userId, new UpdateUserDTO
@@ -82,7 +79,6 @@ namespace WebService.Controllers
                     SoDienThoai = updateDto.SoDienThoai,
                     DiaChi = updateDto.DiaChi
                 });
-
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)

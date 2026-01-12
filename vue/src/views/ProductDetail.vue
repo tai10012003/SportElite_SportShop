@@ -4,8 +4,12 @@
       <div v-if="product">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="/san-pham">Sản phẩm</a></li>
+            <li class="breadcrumb-item">
+              <router-link to="/">Trang chủ</router-link>
+            </li>
+            <li class="breadcrumb-item">
+              <router-link to="/san-pham">Sản phẩm</router-link>
+            </li>
             <li class="breadcrumb-item active">{{ product.tenSanPham }}</li>
           </ol>
         </nav>

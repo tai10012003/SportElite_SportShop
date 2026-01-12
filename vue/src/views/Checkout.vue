@@ -3,9 +3,15 @@
     <div class="container">
       <nav aria-label="breadcrumb-cart">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-          <li class="breadcrumb-item"><a href="/gio-hang">Giỏ hàng</a></li>
-          <li class="breadcrumb-item"><a href="/thanh-toan">Thanh toán</a></li>
+          <li class="breadcrumb-item">
+            <router-link to="/">Trang chủ</router-link>
+          </li>
+          <li class="breadcrumb-item">
+            <router-link to="/gio-hang">Giỏ hàng</router-link>
+          </li>
+          <li class="breadcrumb-item">
+            <router-link to="/thanh-toan">Thanh toán</router-link>
+          </li>
         </ol>
       </nav>
       <div class="row">
@@ -137,7 +143,7 @@ const handlePlaceOrder = async (orderTotals) => {
     }).then((sweetResult) => {
       cartStore.clearCart()
       if (sweetResult.isConfirmed) {
-        router.push('/don-hang')
+        router.push('/don-hang-cua-toi')
       } else {
         router.push('/san-pham')
       }

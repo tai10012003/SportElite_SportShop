@@ -2,6 +2,7 @@ using AutoMapper;
 using WebService.DTOs.Orders;
 using WebService.Enums;
 using WebService.Interfaces.Orders;
+using WebService.Interfaces.Users;
 using WebService.Models;
 
 namespace WebService.Services
@@ -9,11 +10,13 @@ namespace WebService.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IUserRepository userRepository, IMapper mapper)
         {
             _orderRepository = orderRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
@@ -54,6 +57,7 @@ namespace WebService.Services
                 MaDonHang = o.MaDonHang,
                 TenNguoiNhan = o.TenNguoiNhan,
                 TongThanhToan = o.TongThanhToan,
+                PhuongThucThanhToan = o.PhuongThucThanhToan,
                 TrangThai = o.TrangThai,
                 DaThanhToan = o.DaThanhToan,
                 NgayTao = o.NgayTao,
@@ -63,6 +67,7 @@ namespace WebService.Services
 
         public async Task<OrderResponseDto> CreateOrderAsync(CreateOrderDto createOrderDto, string maNguoiDung)
         {
+            await UpdateUserInfoFromCheckout(maNguoiDung, createOrderDto);
             var tamTinh = createOrderDto.Items.Sum(i => i.DonGia * i.SoLuong);
             var phiVanChuyen = tamTinh >= 500000 ? 0 : 30000;
             var soTienGiam = 0m;
@@ -153,6 +158,20 @@ namespace WebService.Services
         public async Task<bool> DeleteOrderAsync(int id)
         {
             return await _orderRepository.DeleteAsync(id);
+        }
+
+        private async Task UpdateUserInfoFromCheckout(string maNguoiDung, CreateOrderDto orderDto)
+        {
+            var allUsers = await _userRepository.GetAllAsync();
+            var user = allUsers.FirstOrDefault(u => u.MaNguoiDung == maNguoiDung);
+            if (user != null)
+            {
+                user.HoTen = orderDto.TenNguoiNhan;
+                user.SoDienThoai = orderDto.SoDienThoai;
+                user.DiaChi = orderDto.DiaChi;
+                user.NgayCapNhat = DateTime.Now;
+                await _userRepository.UpdateAsync(user);
+            }
         }
     }
 }

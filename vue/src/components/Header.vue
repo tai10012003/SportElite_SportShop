@@ -102,8 +102,8 @@ function logout() {
                   </router-link>
                 </li>
                 <li>
-                  <router-link class="dropdown-item" to="/don-hang">
-                    <i class="bi bi-bag me-2"></i>Đơn hàng
+                  <router-link class="dropdown-item" to="/don-hang-cua-toi">
+                    <i class="bi bi-bag me-2"></i>Đơn hàng của tôi
                   </router-link>
                 </li>
                 <li><hr class="dropdown-divider"></li>

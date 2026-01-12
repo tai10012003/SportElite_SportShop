@@ -1,73 +1,77 @@
 <template>
-    <div class="cart-page">
-      <div class="container">
-        <nav aria-label="breadcrumb-cart">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="/gio-hang">Giỏ hàng</a></li>
-          </ol>
-        </nav>
-        <div v-if="itemCount > 0">
-          <div class="cart-table-wrapper">
-            <div class="table-header-actions">
-              <h2 class="cart-title">GIỎ HÀNG CỦA BẠN</h2>
-              <button @click="clearAll" class="btn-clear-cart">
-                <i class="bi bi-trash"></i> Xóa tất cả
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="cart-table">
-                <thead>
-                  <tr>
-                    <th class="table-head-text product-name-head">Sản phẩm</th>
-                    <th class="table-head-text">Kích thước</th>
-                    <th class="table-head-text">Màu sắc</th>
-                    <th class="table-head-text">Đơn giá</th>
-                    <th class="table-head-text">Số lượng</th>
-                    <th class="table-head-text">Thành tiền</th>
-                    <th class="table-head-text">Xóa</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <CartItem
-                    v-for="(item, key) in items"
-                    :key="key"
-                    :item="item"
-                    :item-key="key"
-                  />
-                </tbody>
-              </table>
-            </div>
-            <div class="cart-footer-actions">
-              <router-link to="/san-pham" class="btn-continue-shopping">
-                  <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
-              </router-link>
-              <div class="cart-total-section">
-                <div class="total-info">
-                  <span class="total-label">Tổng cộng:</span>
-                  <span class="total-amount">{{ formatPrice(totalAmount) }}₫</span>
-                </div>
-                <router-link to="/thanh-toan" class="btn-checkout">
-                  <i class="bi bi-credit-card"></i> TIẾN HÀNH THANH TOÁN
-                </router-link>
-              </div>
-            </div>
+  <div class="cart-page">
+    <div class="container">
+      <nav aria-label="breadcrumb-cart">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <router-link to="/">Trang chủ</router-link>
+          </li>
+          <li class="breadcrumb-item">
+            <router-link to="/gio-hang">Giỏ hàng</router-link>
+          </li>
+        </ol>
+      </nav>
+      <div v-if="itemCount > 0">
+        <div class="cart-table-wrapper">
+          <div class="table-header-actions">
+            <h2 class="cart-title">GIỎ HÀNG CỦA BẠN</h2>
+            <button @click="clearAll" class="btn-clear-cart">
+              <i class="bi bi-trash"></i> Xóa tất cả
+            </button>
           </div>
-        </div>
-        <div v-else class="cart-empty">
-          <div class="empty-cart-content">
-            <div class="empty-icon">
-              <i class="bi bi-cart-x"></i>
-            </div>
-            <h4 class="empty-title">Giỏ hàng của bạn đang trống</h4>
-            <p class="empty-text">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm!</p>
-            <router-link to="/san-pham" class="btn-shop-now">
-              <i class="bi bi-bag-check"></i> Mua sắm ngay
+          <div class="table-responsive">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th class="table-head-text product-name-head">Sản phẩm</th>
+                  <th class="table-head-text">Kích thước</th>
+                  <th class="table-head-text">Màu sắc</th>
+                  <th class="table-head-text">Đơn giá</th>
+                  <th class="table-head-text">Số lượng</th>
+                  <th class="table-head-text">Thành tiền</th>
+                  <th class="table-head-text">Xóa</th>
+                </tr>
+              </thead>
+              <tbody>
+                <CartItem
+                  v-for="(item, key) in items"
+                  :key="key"
+                  :item="item"
+                  :item-key="key"
+                />
+              </tbody>
+            </table>
+          </div>
+          <div class="cart-footer-actions">
+            <router-link to="/san-pham" class="btn-continue-shopping">
+                <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
             </router-link>
+            <div class="cart-total-section">
+              <div class="total-info">
+                <span class="total-label">Tổng cộng:</span>
+                <span class="total-amount">{{ formatPrice(totalAmount) }}₫</span>
+              </div>
+              <router-link to="/thanh-toan" class="btn-checkout">
+                <i class="bi bi-credit-card"></i> TIẾN HÀNH THANH TOÁN
+              </router-link>
+            </div>
           </div>
         </div>
       </div>
+      <div v-else class="cart-empty">
+        <div class="empty-cart-content">
+          <div class="empty-icon">
+            <i class="bi bi-cart-x"></i>
+          </div>
+          <h4 class="empty-title">Giỏ hàng của bạn đang trống</h4>
+          <p class="empty-text">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm!</p>
+          <router-link to="/san-pham" class="btn-shop-now">
+            <i class="bi bi-bag-check"></i> Mua sắm ngay
+          </router-link>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup>

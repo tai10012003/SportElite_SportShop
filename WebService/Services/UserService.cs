@@ -45,7 +45,6 @@ public class UserService : IUserService
         user.SoDienThoai = dto.SoDienThoai;
         user.DiaChi = dto.DiaChi;
         user.NgayCapNhat = DateTime.Now;
-
         await _context.SaveChangesAsync();
         return _mapper.Map<UserResponseDTO>(user);
     }
@@ -58,7 +57,6 @@ public class UserService : IUserService
         user.Email = dto.Email;
         user.SoDienThoai = dto.SoDienThoai;
         user.DiaChi = dto.DiaChi;
-
         if (dto.TrangThai.HasValue) user.TrangThai = dto.TrangThai.Value;
         if (!string.IsNullOrWhiteSpace(dto.Quyen)) user.Quyen = dto.Quyen;
         user.NgayCapNhat = DateTime.Now;
@@ -70,10 +68,8 @@ public class UserService : IUserService
     {
         var entity = _mapper.Map<User>(dto);
         entity.NgayTao = entity.NgayCapNhat = DateTime.Now;
-
         _context.Users.Add(entity);
         await _context.SaveChangesAsync();
-
         return _mapper.Map<UserResponseDTO>(entity);
     }
 
@@ -81,10 +77,8 @@ public class UserService : IUserService
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null) throw new KeyNotFoundException("Không tìm thấy người dùng");
-
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
-
         return _mapper.Map<UserResponseDTO>(user);
     }
 }
