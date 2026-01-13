@@ -16,12 +16,17 @@ namespace WebService.Repositories
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.AsNoTracking().ToListAsync();
         }
 
         public async Task<User?> GetByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
+        }
+
+        public async Task<User?> GetByMaNguoiDungAsync(string maNguoiDung)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.MaNguoiDung == maNguoiDung);
         }
 
         public async Task<User?> GetByEmailAsync(string email)

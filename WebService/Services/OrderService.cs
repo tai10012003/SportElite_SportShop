@@ -162,8 +162,7 @@ namespace WebService.Services
 
         private async Task UpdateUserInfoFromCheckout(string maNguoiDung, CreateOrderDto orderDto)
         {
-            var allUsers = await _userRepository.GetAllAsync();
-            var user = allUsers.FirstOrDefault(u => u.MaNguoiDung == maNguoiDung);
+            var user = await _userRepository.GetByMaNguoiDungAsync(maNguoiDung);
             if (user != null)
             {
                 user.HoTen = orderDto.TenNguoiNhan;
