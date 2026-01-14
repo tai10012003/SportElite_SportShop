@@ -9,6 +9,7 @@ import AuthService from '@/services/AuthService'
 import ProductDetail from '@/views/ProductDetail.vue'
 import Cart from '@/views/Cart.vue'
 import Checkout from '@/views/Checkout.vue'
+import MyOrders from '@/views/MyOrders.vue'
 
 const routes = [
   {
@@ -41,6 +42,11 @@ const routes = [
     path: '/thanh-toan',
     name: 'Checkout',
     component: Checkout
+  },
+  {
+    path: '/don-hang-cua-toi',
+    name: 'MyOrders',
+    component: MyOrders
   },
   {
     path: '/dang-nhap',
