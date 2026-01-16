@@ -77,7 +77,7 @@
             </button>
           </div>
           <div class="auth-footer">
-            <p>Chưa có tài khoản? <router-link to="/register">Đăng ký ngay</router-link></p>
+            <p>Chưa có tài khoản? <router-link to="/dang-ky">Đăng ký ngay</router-link></p>
           </div>
         </form>
       </div>
