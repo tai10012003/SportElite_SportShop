@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { addToCart } from '@/assets/js/main'
+import QuickAddModal from '@/components/user/product/QuickAddProductToCart.vue'
 import ProductService from '@/services/ProductService'
 
+const selectedProduct = ref(null)
 const featuredProducts = ref([])
+const isModalOpen = ref(false)
 
 onMounted(async () => {
   try {
@@ -22,11 +25,20 @@ const formatPrice = (price) => {
   return new Intl.NumberFormat('vi-VN').format(price)
 }
 
-const handleAddToCart = async (product) => {
-  const cartCount = await addToCart(product.id)
-  if (cartCount) {
-    console.log('Cart updated, new count:', cartCount)
-  }
+const getImagePath = (product) => {
+  if (product.mainImage) return product.mainImage
+  if (!product.hinhAnh || product.hinhAnh.length === 0) return '/images/products/no-image.jpg'
+  const mainImage = product.hinhAnh.find(img => img.anhChinh) || product.hinhAnh[0]
+  return mainImage ? `/uploads/products/${mainImage.duongDan}` : '/images/products/no-image.jpg'
+}
+
+const openQuickAddModal = (product) => {
+  selectedProduct.value = product
+  isModalOpen.value = true
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
 }
 </script>
 
@@ -41,23 +53,23 @@ const handleAddToCart = async (product) => {
               -{{ Math.round((1 - product.giaKhuyenMai/product.gia) * 100) }}%
             </div>
             <div class="product-image" v-if="product.mainImage">
-              <router-link :to="'/san-pham/' + product.slug">
-                <img :src="product.mainImage" :alt="product.tenSanPham">
+              <router-link :to="`/san-pham/` + product.slug">
+                <img :src="getImagePath(product)" :alt="product.tenSanPham" class="img-fluid">
               </router-link>
               <div class="product-actions">
-                <button class="btn btn-light btn-sm" @click="handleAddToCart(product)">
+               <button class="btn btn-light btn-sm" @click="openQuickAddModal(product)" title="Thêm vào giỏ">
                   <i class="bi bi-cart-plus"></i>
                 </button>
-                <button class="btn btn-light btn-sm">
+                <button class="btn btn-light btn-sm" title="Yêu thích">
                   <i class="bi bi-heart"></i>
                 </button>
-                <router-link :to="'/san-pham/' + product.slug" class="btn btn-light btn-sm">
+                <router-link :to="'/san-pham/' + product.slug" class="btn btn-light btn-sm" title="Xem chi tiết">
                   <i class="bi bi-eye"></i>
                 </router-link>
               </div>
             </div>
             <div class="product-info">
-              <router-link :to="'/san-pham/' + product.slug" class="text-decoration-none">
+              <router-link :to="`/san-pham/${product.slug}`" class="text-decoration-none">
                 <h3 class="product-title">{{ product.tenSanPham }}</h3>
               </router-link>
               <div class="product-price">
@@ -72,6 +84,11 @@ const handleAddToCart = async (product) => {
           </div>
         </div>
       </div>
+      <QuickAddModal 
+        :is-open="isModalOpen" 
+        :product="selectedProduct"
+        @close="closeModal"
+      />
     </div>
   </section>
 </template>

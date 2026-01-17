@@ -10,7 +10,7 @@
             <div class="row">
               <div class="col-md-5">
                 <div class="modal-image-wrapper">
-                  <img :src="currentImage" :alt="product.tenSanPham" class="modal-main-image">
+                  <img :src="productImage" :alt="product.tenSanPham" class="modal-main-image">
                 </div>
               </div>
               <div class="col-md-7">
@@ -138,19 +138,33 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 const cartStore = useCartStore()
 
-const currentImage = ref('')
 const quantity = ref(1)
 const selectedColor = ref('')
 const selectedSize = ref('')
 
+const productImage = computed(() => {
+  if (!props.product) return '/images/no-image.jpg'
+  if (props.product.mainImage) {
+    return props.product.mainImage
+  }
+  if (props.product.images && props.product.images.length > 0) {
+    return props.product.images[0]
+  }
+  if (props.product.hinhAnh && props.product.hinhAnh.length > 0) {
+    const mainImage = props.product.hinhAnh.find(img => img.anhChinh) || props.product.hinhAnh[0]
+    return mainImage ? `/uploads/products/${mainImage.duongDan}` : '/images/no-image.jpg'
+  }
+  return '/images/no-image.jpg'
+})
+
 const stockQuantity = computed(() => parseInt(props.product.soLuong) || 0)
 
 const colors = computed(() => {
-  return props.product.mauSac?.trim() ? props.product.mauSac.split(',').map(c => c.trim()) : ['Đỏ', 'Xanh', 'Đen']
+  return props.product.mauSac?.trim() ? props.product.mauSac.split(',').map(c => c.trim()) : []
 })
 
 const sizes = computed(() => {
-  return props.product.kichThuoc?.trim() ? props.product.kichThuoc.split(',').map(s => s.trim()) : ['S', 'M', 'L', 'XL']
+  return props.product.kichThuoc?.trim() ? props.product.kichThuoc.split(',').map(s => s.trim()) : []
 })
 
 const hasColors = computed(() => colors.value.length > 0)
@@ -161,13 +175,6 @@ watch(() => props.isOpen, (newVal) => {
     quantity.value = 1
     selectedColor.value = ''
     selectedSize.value = ''
-    if (props.product.images && props.product.images.length > 0) {
-      currentImage.value = props.product.images[0]
-    } else if (props.product.mainImage) {
-      currentImage.value = props.product.mainImage
-    } else {
-      currentImage.value = '/images/no-image.jpg'
-    }
     document.body.style.overflow = 'hidden'
   } else {
     document.body.style.overflow = ''

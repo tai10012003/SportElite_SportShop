@@ -8,11 +8,11 @@
             -{{ calculateDiscountPercent(related.gia, related.giaKhuyenMai) }}%
           </div>
           <div class="product-image">
-            <a :href="'/san-pham/' + related.slug" class="product-link">
-              <img :src="related.mainImage || '/WebbandoTT/app/public/images/no-image.jpg'" :alt="related.tenSanPham" class="img-fluid">
-            </a>
+            <router-link :to="`/san-pham/` + related.slug">
+              <img :src="getImagePath(related)" :alt="related.tenSanPham" class="img-fluid">
+            </router-link>
             <div class="product-actions">
-              <button class="btn btn-light btn-sm add-to-cart" :data-product-id="related.id" :data-product-name="related.tenSanPham" :data-product-price="related.giaKhuyenMai || related.gia">
+              <button class="btn btn-light btn-sm add-to-cart" @click="openQuickAddModal(related)">
                 <i class="bi bi-cart-plus"></i>
               </button>
               <button class="btn btn-light btn-sm btn-wishlist">
@@ -44,26 +44,50 @@
         </div>
       </div>
     </div>
+    <QuickAddProductToCart
+      v-if="selectedProduct"
+      :is-open="isModalOpen"
+      :product="selectedProduct"
+      @close="closeModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import QuickAddProductToCart from '@/components/user/product/QuickAddProductToCart.vue'
 
-defineProps({
+const props = defineProps({
   relatedProducts: {
     type: Array,
     default: () => []
   }
 })
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('vi-VN').format(price)
-}
+const isModalOpen = ref(false)
+const selectedProduct = ref(null)
+
+const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price)
 
 const calculateDiscountPercent = (original, discounted) => {
   if (!original || !discounted || discounted >= original) return 0
   return Math.round(((original - discounted) / original) * 100)
+}
+
+const getImagePath = (product) => {
+  if (product.mainImage) return product.mainImage
+  if (!product.hinhAnh || product.hinhAnh.length === 0) return '/images/products/no-image.jpg'
+  const mainImage = product.hinhAnh.find(img => img.anhChinh) || product.hinhAnh[0]
+  return mainImage ? `/uploads/products/${mainImage.duongDan}` : '/images/products/no-image.jpg'
+}
+
+const openQuickAddModal = (product) => {
+  selectedProduct.value = product
+  isModalOpen.value = true
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
 }
 </script>
 
