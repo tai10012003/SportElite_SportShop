@@ -16,6 +16,7 @@ namespace WebService.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -139,6 +140,28 @@ namespace WebService.Data
                 .WithMany(o => o.LichSuTrangThai)
                 .HasForeignKey(osh => osh.MaDonHang)
                 .HasPrincipalKey(o => o.MaDonHang);
+
+            modelBuilder.Entity<Wishlist>()
+                .Property(w => w.NgayThem)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Wishlist>()
+                .HasIndex(w => new { w.MaNguoiDung, w.MaSanPham })
+                .IsUnique();
+
+            modelBuilder.Entity<Wishlist>()
+                .HasOne(w => w.NguoiDung)
+                .WithMany()
+                .HasForeignKey(w => w.MaNguoiDung)
+                .HasPrincipalKey(u => u.MaNguoiDung)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Wishlist>()
+                .HasOne(w => w.SanPham)
+                .WithMany()
+                .HasForeignKey(w => w.MaSanPham)
+                .HasPrincipalKey(p => p.MaSanPham)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

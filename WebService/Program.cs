@@ -12,6 +12,7 @@ using WebService.Interfaces.Auth;
 using WebService.Interfaces.Users;
 using WebService.Interfaces.ProductReviews;
 using WebService.Interfaces.Orders;
+using WebService.Interfaces.Wishlists;
 using WebService.Repositories;
 using WebService.Services;
 
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -54,6 +56,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
