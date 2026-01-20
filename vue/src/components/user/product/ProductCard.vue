@@ -11,9 +11,10 @@
         <button class="btn btn-light btn-sm" @click="openQuickAddModal" title="Thêm vào giỏ">
           <i class="bi bi-cart-plus"></i>
         </button>
-        <button class="btn btn-light btn-sm" title="Yêu thích">
-          <i class="bi bi-heart"></i>
-        </button>
+        <WishlistButton
+          :ma-san-pham="product.maSanPham"
+          @toggle="handleWishlistToggle"
+        />
         <router-link :to="`/san-pham/` + product.slug" class="btn btn-light btn-sm" title="Xem chi tiết">
           <i class="bi bi-eye"></i>
         </router-link>
@@ -43,6 +44,7 @@
 <script setup>
 import { ref } from 'vue'
 import QuickAddModal from './QuickAddProductToCart.vue'
+import WishlistButton from '@/components/wishlist/WishlistButton.vue'
 
 defineProps(['product'])
 
@@ -63,6 +65,10 @@ const openQuickAddModal = () => {
 
 const closeModal = () => {
   isModalOpen.value = false
+}
+
+const handleWishlistToggle = (data) => {
+  console.log('Wishlist toggled:', data)
 }
 </script>
 
@@ -186,7 +192,6 @@ const closeModal = () => {
   animation: fadeInUp 1s ease-out;
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .product-card {
     height: 400px;

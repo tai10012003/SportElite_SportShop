@@ -10,6 +10,7 @@ import ProductDetail from '@/views/ProductDetail.vue'
 import Cart from '@/views/Cart.vue'
 import Checkout from '@/views/Checkout.vue'
 import MyOrders from '@/views/MyOrders.vue'
+import Wishlist from '@/views/Wishlist.vue'
 
 const routes = [
   {
@@ -47,6 +48,11 @@ const routes = [
     path: '/don-hang-cua-toi',
     name: 'MyOrders',
     component: MyOrders
+  },
+  {
+    path: '/san-pham-yeu-thich',
+    name: 'Wishlist',
+    component: Wishlist
   },
   {
     path: '/dang-nhap',
