@@ -1,7 +1,5 @@
 import axios from 'axios'
-
 const API_URL = 'http://localhost:5000/api'
-const VUE_BASE_URL = 'http://localhost:5173'
 
 export default {
   async getFeaturedProducts() {
@@ -71,9 +69,7 @@ export default {
       const res = await axios.get(`${API_URL}/Product/slug/${slug}`)
       const product = res.data
       const mainImage = this.getMainImage(product)
-      const images = product.hinhAnh?.map(img => 
-        `${VUE_BASE_URL}${img.duongDan.replace('/assets', '/src/assets')}`
-      )
+      const images = product.hinhAnh?.map(img => `${img.duongDan}`) || []
       return {
         ...product,
         mainImage,
@@ -144,7 +140,7 @@ export default {
     if (!product.hinhAnh || !product.hinhAnh.length) return null
     const mainImage = product.hinhAnh.find(img => img.anhChinh) || product.hinhAnh[0]
     if (!mainImage) return null
-    const imagePath = mainImage.duongDan.replace('/assets', '/src/assets')
-    return `${VUE_BASE_URL}${imagePath}`
+    const imagePath = mainImage.duongDan;
+    return `${imagePath}`
   }
 }

@@ -81,7 +81,7 @@
                 <div class="order-items">
                   <div v-for="item in order.items" :key="item.id" class="order-item">
                     <img 
-                      :src="item.hinhAnh || '/images/no-image.jpg'" 
+                      :src="getImage(item)"
                       :alt="item.tenSanPham" 
                       class="order-item-image"
                     >
@@ -139,6 +139,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import OrderService from '@/services/OrderService'
+const VUE_BASE_URL = 'http://localhost:5173'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -188,6 +189,12 @@ const formatDate = (dateString) => {
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
   return `${day}/${month}/${year} ${hours}:${minutes}`
+}
+
+const getImage = (item) => {
+  const getNoImage = "https://res.cloudinary.com/df1wrn1az/image/upload/v1768964222/no-image_v1ltyr.png"
+  if (!item.hinhAnh || item.hinhAnh.length === 0) return getNoImage
+  return `${VUE_BASE_URL}${item.hinhAnh.replace('/assets', '/src/assets')}`
 }
 
 const getStatusClass = (status) => {

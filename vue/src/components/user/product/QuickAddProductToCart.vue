@@ -10,7 +10,7 @@
             <div class="row">
               <div class="col-md-5">
                 <div class="modal-image-wrapper">
-                  <img :src="productImage" :alt="product.tenSanPham" class="modal-main-image">
+                  <img :src="mainImageSrc" :alt="product.tenSanPham" class="modal-main-image" />
                 </div>
               </div>
               <div class="col-md-7">
@@ -107,7 +107,7 @@
                     <button @click="addToCart" class="btn-add-cart">
                       <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
                     </button>
-                    <router-link :to="`/san-pham/${product.slug}`" class="btn-view-detail">
+                    <router-link :to="`/san-pham/${product.slug}`" class="btn-view-detail" @click.native="handleViewDetail">
                       <i class="bi bi-eye"></i> Xem chi tiết
                     </router-link>
                   </div>
@@ -142,19 +142,32 @@ const quantity = ref(1)
 const selectedColor = ref('')
 const selectedSize = ref('')
 
-const productImage = computed(() => {
-  if (!props.product) return '/images/no-image.jpg'
-  if (props.product.mainImage) {
-    return props.product.mainImage
+const mainImageSrc = computed(() => {
+  const getNoImage = "https://res.cloudinary.com/df1wrn1az/image/upload/v1768964222/no-image_v1ltyr.png"
+  const p = props.product
+  if (!p) return getNoImage
+  // Nếu là mảng string (WishlistItem)
+  if (Array.isArray(p.hinhAnh) && typeof p.hinhAnh[0] === 'string') {
+    return p.hinhAnh[0] || getNoImage
   }
-  if (props.product.images && props.product.images.length > 0) {
-    return props.product.images[0]
+  // Nếu là mảng object (ProductCard, Featured, Related)
+  if (Array.isArray(p.hinhAnh) && typeof p.hinhAnh[0] === 'object') {
+    const mainObj = p.hinhAnh.find(img => img.anhChinh) || p.hinhAnh[0]
+    return mainObj && mainObj.duongDan ? mainObj.duongDan : getNoImage
   }
-  if (props.product.hinhAnh && props.product.hinhAnh.length > 0) {
-    const mainImage = props.product.hinhAnh.find(img => img.anhChinh) || props.product.hinhAnh[0]
-    return mainImage ? `/uploads/products/${mainImage.duongDan}` : '/images/no-image.jpg'
+  // Nếu là string
+  if (typeof p.hinhAnh === 'string') {
+    return p.hinhAnh
   }
-  return '/images/no-image.jpg'
+  // Nếu có images (từ prop khác)
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    return p.images[0]
+  }
+  // Nếu có mainImage
+  if (p.mainImage) {
+    return p.mainImage
+  }
+  return getNoImage
 })
 
 const stockQuantity = computed(() => parseInt(props.product.soLuong) || 0)
@@ -298,6 +311,11 @@ const addToCart = async () => {
     showConfirmButton: false
   })
   closeModal()
+}
+
+const handleViewDetail = () => {
+  emit('close')
+  document.body.style.overflow = ''
 }
 </script>
 

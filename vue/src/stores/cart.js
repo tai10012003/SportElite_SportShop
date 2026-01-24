@@ -14,13 +14,24 @@ export const useCartStore = defineStore('cart', () => {
         if (items.value[itemKey]) {
             items.value[itemKey].quantity += quantity
         } else {
+            let image = "https://res.cloudinary.com/df1wrn1az/image/upload/v1768964222/no-image_v1ltyr.png"
+            if (product.mainImage) {
+                image = product.mainImage
+            } else if (Array.isArray(product.hinhAnh) && typeof product.hinhAnh[0] === 'string') {
+                image = product.hinhAnh[0]
+            } else if (Array.isArray(product.hinhAnh) && typeof product.hinhAnh[0] === 'object' && product.hinhAnh[0]?.duongDan) {
+                const mainObj = product.hinhAnh.find(img => img.anhChinh) || product.hinhAnh[0]
+                image = mainObj?.duongDan || image
+            } else if (product.hinhAnh && typeof product.hinhAnh === 'string') {
+                image = product.hinhAnh
+            }
             items.value[itemKey] = {
                 id: product.id,
                 maSanPham: product.maSanPham,
                 itemKey,
                 name: product.tenSanPham,
                 price: product.giaKhuyenMai || product.gia,
-                image: product.mainImage || product.hinhAnh?.[0]?.duongDan || '/images/no-image.jpg',
+                image,
                 slug: product.slug,
                 color: selectedColor,
                 size: selectedSize,

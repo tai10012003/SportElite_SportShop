@@ -105,7 +105,7 @@ const formatPrice = (price) => {
 }
 
 const getItemImage = (item) => {
-  return item.image || '/images/no-image.jpg'
+  return item.image || 'https://res.cloudinary.com/df1wrn1az/image/upload/v1768964222/no-image_v1ltyr.png'
 }
 
 const handlePlaceOrder = () => {

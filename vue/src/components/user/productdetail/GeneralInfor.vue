@@ -1,162 +1,162 @@
 <template>
   <div class="row">
-      <div class="col-lg-5">
-        <div class="detail-gallery">
-          <div class="detail-main-image">
-            <img :src="mainImage" alt="Main Product Image" id="main-product-image">
+    <div class="col-lg-5">
+      <div class="detail-gallery">
+        <div class="detail-main-image">
+          <img :src="mainImage" alt="Main Product Image" id="main-product-image">
+        </div>
+        <div class="detail-thumbnails-wrapper">
+          <button class="thumbnail-nav prev" @click="slideThumbnails('prev')" :disabled="currentSlide === 0">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <div class="detail-thumbnails" ref="thumbnailContainer">
+            <img v-for="(img, index) in product.images" 
+              :key="index" 
+              :src="img" 
+              :alt="'Thumbnail ' + (index + 1)"
+              class="detail-thumbnail" 
+              :class="{ 'active': currentImageIndex == index }" 
+              @click="changeMainImage(img, index)"
+            />
           </div>
-          <div class="detail-thumbnails-wrapper">
-            <button class="thumbnail-nav prev" @click="slideThumbnails('prev')" :disabled="currentSlide === 0">
-              <i class="bi bi-chevron-left"></i>
-            </button>
-            <div class="detail-thumbnails" ref="thumbnailContainer">
-              <img v-for="(img, index) in product.images" 
-                  :key="index" 
-                  :src="img" 
-                  :alt="'Thumbnail ' + (index + 1)"
-                  class="detail-thumbnail" 
-                  :class="{ 'active': currentImageIndex == index }" 
-                  @click="changeMainImage(img, index)">
-            </div>
-            <button class="thumbnail-nav next" @click="slideThumbnails('next')" :disabled="currentSlide >= Math.ceil(product.images.length / 4) - 1">
-              <i class="bi bi-chevron-right"></i>
-            </button>
-          </div>
+          <button class="thumbnail-nav next" @click="slideThumbnails('next')" :disabled="currentSlide >= Math.ceil(product.images.length / 4) - 1">
+            <i class="bi bi-chevron-right"></i>
+          </button>
         </div>
       </div>
-      <div class="col-lg-7">
-        <div class="detail-info-wrapper">
-          <h1 class="detail-product-title">{{ product.tenSanPham }}</h1>
-
-          <div class="detail-meta-info">
-            <div class="detail-meta-item">
-              <span class="detail-meta-label">Mã sản phẩm:</span>
-              <span>{{ product.maSanPham }}</span>
-            </div>
-            <div class="detail-meta-item">
-              <span class="detail-meta-label">Danh mục:</span>
-              <span>{{ product.tenDanhMuc }}</span>
-            </div>
-            <div class="detail-meta-item">
-              <span class="detail-meta-label">Thương hiệu:</span>
-              <span>{{ product.tenThuongHieu }}</span>
-            </div>
-            <div class="detail-meta-item">
-              <span class="detail-meta-label">Lượt xem:</span>
-              <span>{{ product.luotXem }}</span>
-            </div>
-            <div class="detail-meta-item">
-              <span class="detail-meta-label">Đánh giá:</span>
-              <span class="rating-wrapper">
-                <div class="star-rating">
-                  <i v-for="i in 5" 
-                    :key="i" 
-                    :class="[
-                      'bi', 
-                      i <= averageRating 
-                        ? 'bi-star-fill' 
-                        : (i - averageRating <= 0.5 
-                          ? 'bi-star-half' 
-                          : 'bi-star'),
-                      'star-icon'
-                    ]">
-                  </i>
-                </div>
-                <span class="rating-text">
-                  ({{ averageRating.toFixed(1) }}/5 - {{ totalReviews }} đánh giá)
-                </span>
-              </span>
-            </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="detail-info-wrapper">
+        <h1 class="detail-product-title">{{ product.tenSanPham }}</h1>
+        <div class="detail-meta-info">
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Mã sản phẩm:</span>
+            <span>{{ product.maSanPham }}</span>
           </div>
-          <div class="detail-price-wrapper">
-            <label class="form-label">Giá: </label>
-            <span class="detail-current-price">{{ formatPrice(product.giaKhuyenMai || product.gia) }}₫</span>
-            <span class="detail-old-price" v-if="product.giaKhuyenMai">{{ formatPrice(product.gia) }}₫</span>
-            <span class="detail-discount" v-if="product.giaKhuyenMai">
-              -{{ Math.round(((product.gia - product.giaKhuyenMai) / product.gia) * 100) }}%
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Danh mục:</span>
+            <span>{{ product.tenDanhMuc }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Thương hiệu:</span>
+            <span>{{ product.tenThuongHieu }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Lượt xem:</span>
+            <span>{{ product.luotXem }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Đánh giá:</span>
+            <span class="rating-wrapper">
+              <div class="star-rating">
+                <i v-for="i in 5" 
+                  :key="i" 
+                  :class="[
+                    'bi', 
+                    i <= averageRating 
+                      ? 'bi-star-fill' 
+                      : (i - averageRating <= 0.5 
+                        ? 'bi-star-half' 
+                        : 'bi-star'),
+                    'star-icon'
+                  ]">
+                </i>
+              </div>
+              <span class="rating-text">
+                ({{ averageRating.toFixed(1) }}/5 - {{ totalReviews }} đánh giá)
+              </span>
             </span>
           </div>
-          <form v-if="product.tinhTrang && product.soLuong > 0" @submit.prevent class="detail-add-cart-form">
-            <input type="hidden" name="product_id" :value="product.id">
-            <div class="detail-quantity-control">
-              <label class="detail-quantity-label">Số lượng:</label>
-              <div class="input-group">
-                <button type="button" @click="updateQuantity('decrease')" class="btn-quantity">-</button>
-                <input type="number" v-model="quantity" min="1" :max="product.soLuong" class="quantity-input">
-                <button type="button" @click="updateQuantity('increase')" class="btn-quantity">+</button>
-              </div>
-              <span class="detail-stock-info">(Còn {{ product.soLuong }} sản phẩm)</span>
+        </div>
+        <div class="detail-price-wrapper">
+          <label class="form-label">Giá: </label>
+          <span class="detail-current-price">{{ formatPrice(product.giaKhuyenMai || product.gia) }}₫</span>
+          <span class="detail-old-price" v-if="product.giaKhuyenMai">{{ formatPrice(product.gia) }}₫</span>
+          <span class="detail-discount" v-if="product.giaKhuyenMai">
+            -{{ Math.round(((product.gia - product.giaKhuyenMai) / product.gia) * 100) }}%
+          </span>
+        </div>
+        <form v-if="product.tinhTrang && product.soLuong > 0" @submit.prevent class="detail-add-cart-form">
+          <input type="hidden" name="product_id" :value="product.id">
+          <div class="detail-quantity-control">
+            <label class="detail-quantity-label">Số lượng:</label>
+            <div class="input-group">
+              <button type="button" @click="updateQuantity('decrease')" class="btn-quantity">-</button>
+              <input type="number" v-model="quantity" min="1" :max="product.soLuong" class="quantity-input">
+              <button type="button" @click="updateQuantity('increase')" class="btn-quantity">+</button>
             </div>
-            <div class="product-variations mt-4 mb-4" v-if="product.mauSac || product.kichThuoc">
-              <div class="variation-group mb-4" v-if="product.mauSac">
-                <label class="form-label">Màu sắc: <span class="text-danger">*</span>
-                  <!-- <span v-if="selectedColor" class="selected-text">({{ selectedColor }})</span> -->
-                </label>
-                <div class="color-options">
-                  <div v-for="(color, index) in getColors" :key="index" class="color-option">
-                    <input type="radio" 
-                      :id="'color_' + color.trim()" 
-                      :value="color.trim()"
-                      v-model="selectedColor" 
-                      class="color-radio">
-                    <label :for="'color_' + color.trim()" 
-                      class="color-label"
-                      :style="getColorStyle(color.trim())"
-                      :title="color.trim()">
-                      <span class="color-name">{{ color.trim() }}</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div class="variation-group" v-if="product.kichThuoc">
-                <label class="form-labels">Kích thước: <span class="text-danger">*</span>
-                  <!-- <span v-if="selectedSize" class="selected-text">({{ selectedSize }})</span> -->
-                </label>
-                <div class="size-options">
-                  <div v-for="(size, index) in getSizes" :key="index" class="size-option">
-                    <input type="radio" 
-                      :id="'size_' + size.trim()" 
-                      :value="size.trim()"
-                      v-model="selectedSize" 
-                      class="size-radio">
-                    <label :for="'size_' + size.trim()" class="size-label">
-                      {{ size.trim() }}
-                    </label>
-                  </div>
+            <span class="detail-stock-info">(Còn {{ product.soLuong }} sản phẩm)</span>
+          </div>
+          <div class="product-variations mt-4 mb-4" v-if="product.mauSac || product.kichThuoc">
+            <div class="variation-group mb-4" v-if="product.mauSac">
+              <label class="form-label">Màu sắc: <span class="text-danger">*</span>
+                <!-- <span v-if="selectedColor" class="selected-text">({{ selectedColor }})</span> -->
+              </label>
+              <div class="color-options">
+                <div v-for="(color, index) in getColors" :key="index" class="color-option">
+                  <input type="radio" 
+                    :id="'color_' + color.trim()" 
+                    :value="color.trim()"
+                    v-model="selectedColor" 
+                    class="color-radio">
+                  <label :for="'color_' + color.trim()" 
+                    class="color-label"
+                    :style="getColorStyle(color.trim())"
+                    :title="color.trim()">
+                    <span class="color-name">{{ color.trim() }}</span>
+                  </label>
                 </div>
               </div>
             </div>
-            <div class="detail-buttons">
-              <button @click="addToCart" class="detail-add-to-cart">
-                <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
-              </button>
-              <button type="button" class="detail-add-to-wishlist">
-                <i class="bi bi-heart"></i> Thêm vào yêu thích
-              </button>
+            <div class="variation-group" v-if="product.kichThuoc">
+              <label class="form-labels">Kích thước: <span class="text-danger">*</span>
+                <!-- <span v-if="selectedSize" class="selected-text">({{ selectedSize }})</span> -->
+              </label>
+              <div class="size-options">
+                <div v-for="(size, index) in getSizes" :key="index" class="size-option">
+                  <input type="radio" 
+                    :id="'size_' + size.trim()" 
+                    :value="size.trim()"
+                    v-model="selectedSize" 
+                    class="size-radio">
+                  <label :for="'size_' + size.trim()" class="size-label">
+                    {{ size.trim() }}
+                  </label>
+                </div>
+              </div>
             </div>
-          </form>
-          <div v-else class="alert alert-warning mt-3" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <strong>{{ !product.tinhTrang ? 'Sản phẩm tạm ngừng kinh doanh!' : 'Sản phẩm đã hết hàng!' }}</strong>
-            <p class="mb-0 mt-2">Vui lòng quay lại sau hoặc liên hệ với chúng tôi để biết thêm thông tin!</p>
           </div>
-          <div class="detail-social-share">
-            <a href="#" class="detail-social-btn detail-facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="detail-social-btn detail-twitter"><i class="bi bi-twitter"></i></a>
-            <a href="#" class="detail-social-btn detail-pinterest"><i class="bi bi-pinterest"></i></a>
+          <div class="detail-buttons">
+            <button @click="addToCart" class="detail-add-to-cart">
+              <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
+            </button>
+            <button type="button" class="detail-add-to-wishlist">
+              <i class="bi bi-heart"></i> Thêm vào yêu thích
+            </button>
           </div>
-          <div class="detail-short-desc">
-            <h5 class="detail-short-desc-title">Mô tả sản phẩm</h5>
-            <div class="detail-short-desc-content">
-              <span v-if="product.moTa && product.moTa.trim() !== ''">{{ product.moTa }}</span>
-              <span v-else class="no-description">
-                Hiện tại chưa có mô tả cho sản phẩm này. Chúng tôi sẽ cập nhật sớm nhất !!
-              </span>
-            </div>
+        </form>
+        <div v-else class="alert alert-warning mt-3" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>{{ !product.tinhTrang ? 'Sản phẩm tạm ngừng kinh doanh!' : 'Sản phẩm đã hết hàng!' }}</strong>
+          <p class="mb-0 mt-2">Vui lòng quay lại sau hoặc liên hệ với chúng tôi để biết thêm thông tin!</p>
+        </div>
+        <div class="detail-social-share">
+          <a href="#" class="detail-social-btn detail-facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="detail-social-btn detail-twitter"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="detail-social-btn detail-pinterest"><i class="bi bi-pinterest"></i></a>
+        </div>
+        <div class="detail-short-desc">
+          <h5 class="detail-short-desc-title">Mô tả sản phẩm</h5>
+          <div class="detail-short-desc-content">
+            <span v-if="product.moTa && product.moTa.trim() !== ''">{{ product.moTa }}</span>
+            <span v-else class="no-description">
+              Hiện tại chưa có mô tả cho sản phẩm này. Chúng tôi sẽ cập nhật sớm nhất !!
+            </span>
           </div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -357,7 +357,7 @@ const totalReviews = computed(() => {
 })
 
 onMounted(() => {
-  mainImage.value = product.images?.[0] || '/WebbandoTT/app/public/images/no-image.jpg'
+  mainImage.value = product.images?.[0] || 'https://res.cloudinary.com/df1wrn1az/image/upload/v1768964222/no-image_v1ltyr.png'
 })
 </script>
 
