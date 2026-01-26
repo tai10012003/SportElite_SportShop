@@ -89,10 +89,17 @@ namespace WebService.Mappings
                 .ForMember(dest => dest.Gia, opt => opt.MapFrom(src => src.SanPham!.Gia))
                 .ForMember(dest => dest.GiaKhuyenMai, opt => opt.MapFrom(src => src.SanPham!.GiaKhuyenMai))
                 .ForMember(dest => dest.SoLuong, opt => opt.MapFrom(src => src.SanPham!.SoLuong))
+                .ForMember(dest => dest.MaDanhMuc, opt => opt.MapFrom(src => src.SanPham!.MaDanhMuc))
                 .ForMember(dest => dest.MaThuongHieu, opt => opt.MapFrom(src => src.SanPham!.MaThuongHieu))
-                .ForMember(dest => dest.TenThuongHieu, opt => opt.Ignore())
                 .ForMember(dest => dest.NgayThem, opt => opt.MapFrom(src => src.NgayThem))
-                .ForMember(dest => dest.ConHang, opt => opt.MapFrom(src => src.SanPham!.SoLuong > 0));
+                .ForMember(dest => dest.ConHang, opt => opt.MapFrom(src => src.SanPham!.SoLuong > 0))
+                .ForMember(dest => dest.TenDanhMuc, opt => opt.Ignore())
+                .ForMember(dest => dest.TenThuongHieu, opt => opt.Ignore())
+                .ForMember(dest => dest.AverageRating, opt => opt.Ignore())
+                .ForMember(dest => dest.TotalReviews, opt => opt.Ignore())
+                .ForMember(dest => dest.KichThuoc, opt => opt.Ignore())
+                .ForMember(dest => dest.MauSac, opt => opt.Ignore())
+                .ForMember(dest => dest.HinhAnhList, opt => opt.Ignore());
         }
     }
 }

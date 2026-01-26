@@ -3,6 +3,8 @@ using WebService.DTOs.Wishlists;
 using WebService.Interfaces.Products;
 using WebService.Interfaces.Wishlists;
 using WebService.Models;
+using WebService.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebService.Services
 {
@@ -11,12 +13,14 @@ namespace WebService.Services
         private readonly IWishlistRepository _wishlistRepo;
         private readonly IProductRepository _productRepo;
         private readonly IMapper _mapper;
+        private readonly AppDbContext _context;
 
-        public WishlistService(IWishlistRepository wishlistRepo, IProductRepository productRepo, IMapper mapper)
+        public WishlistService(IWishlistRepository wishlistRepo, IProductRepository productRepo, IMapper mapper, AppDbContext context)
         {
             _wishlistRepo = wishlistRepo;
             _productRepo = productRepo;
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<WishlistActionResultDto> AddToWishlistAsync(string maNguoiDung, AddToWishlistDto dto)
@@ -96,6 +100,41 @@ namespace WebService.Services
         {
             var wishlists = await _wishlistRepo.GetByMaNguoiDungAsync(maNguoiDung);
             var items = _mapper.Map<List<WishlistItemDto>>(wishlists);
+            var maDanhMucs = wishlists.Select(w => w.SanPham!.MaDanhMuc).Distinct().ToList();
+            var maThuongHieus = wishlists.Select(w => w.SanPham!.MaThuongHieu).Distinct().ToList();
+            var maSanPhams = wishlists.Select(w => w.SanPham!.MaSanPham).ToList();
+            var categories = await _context.Categories.Where(c => maDanhMucs.Contains(c.MaDanhMuc)).ToDictionaryAsync(c => c.MaDanhMuc, c => c.TenDanhMuc);
+            var brands = await _context.Brands.Where(b => maThuongHieus.Contains(b.MaThuongHieu)).ToDictionaryAsync(b => b.MaThuongHieu, b => b.TenThuongHieu);
+            var reviewStats = await _context.ProductReviews
+                .Where(r => maSanPhams.Contains(r.MaSanPham))
+                .GroupBy(r => r.MaSanPham)
+                .Select(g => new
+                {
+                    MaSanPham = g.Key,
+                    AverageRating = g.Average(r => r.DiemDanhGia),
+                    TotalReviews = g.Count()
+                })
+                .ToDictionaryAsync(x => x.MaSanPham);
+            foreach (var item in items)
+            {
+                var product = wishlists.First(w => w.SanPham!.MaSanPham == item.MaSanPham).SanPham!;
+                item.TenDanhMuc = categories.GetValueOrDefault(product.MaDanhMuc, "Danh mục");
+                item.TenThuongHieu = brands.GetValueOrDefault(product.MaThuongHieu, "Thương hiệu");
+                item.KichThuoc = product.KichThuoc;
+                item.MauSac = product.MauSac;
+                item.Slug = product.Slug;
+                item.HinhAnhList = product.HinhAnh.Select(h => h.DuongDan).ToList();
+                if (reviewStats.TryGetValue(product.MaSanPham, out var stats))
+                {
+                    item.AverageRating = Math.Round(stats.AverageRating, 1);
+                    item.TotalReviews = stats.TotalReviews;
+                }
+                else
+                {
+                    item.AverageRating = 0;
+                    item.TotalReviews = 0;
+                }
+            }
             return new WishlistResponseDto
             {
                 TongSanPham = items.Count,
